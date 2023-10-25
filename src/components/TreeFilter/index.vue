@@ -70,8 +70,6 @@ onBeforeMount(async () => {
 	setSelected();
 	if (props.requestApi) {
 		const { result } = await props.requestApi!();
-		console.log(result);
-
 		treeData.value = result;
 		treeAllData.value = [{ id: '', [props.label]: '全部' }, ...result];
 	}

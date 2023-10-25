@@ -2,9 +2,10 @@
 	<div class="system-user-container layout-padding main-box">
 		<TreeFilter ref="orgTreeRef" :request-api="getTreeTableList" id="value" :default-value="initParam.orgId" @change="onChangeTree" />
 		<div class="table-box">
-			<ProTable ref="proTableRef" :init-param="initParam" :columns="columns" :request-api="getTableList" :tool-button="false">
+			<ProTable ref="proTableRef" :init-param="initParam" :columns="columns" :request-api="getTableList" :tool-button="true">
 				<template #tools>
-					<el-button v-auth="'sysuser:add'" type="primary" icon="ele-Plus" @click="onOpenUser(0)">新增</el-button>
+					<!-- v-auth="'sysuser:add'" -->
+					<el-button type="primary" icon="ele-Plus" @click="onOpenUser(0)">新增</el-button>
 				</template>
 				<template #status="scope">
 					<el-tag :type="scope.row.status === 0 ? 'success' : 'danger'"> {{ scope.row.status === 0 ? '启用' : '禁用' }}</el-tag>
@@ -15,13 +16,15 @@
 					>
 				</template>
 				<template #action="scope">
-					<el-button icon="ele-Edit" v-auth="'sysuser:edit'" size="small" text type="primary" @click="onOpenUser(scope.row.id)"> 编辑 </el-button>
-					<el-dropdown v-auths="['sysuser:delete', 'sysuser:reset']">
+					<!-- v-auth="'sysuser:edit'" -->
+					<el-button icon="ele-Edit" size="small" text type="primary" @click="onOpenUser(scope.row.id)"> 编辑 </el-button>
+					<!-- v-auths="['sysuser:delete', 'sysuser:reset']" -->
+					<el-dropdown>
 						<el-button icon="ele-MoreFilled" size="small" text type="primary" style="padding-left: 12px" />
 						<template #dropdown>
 							<el-dropdown-menu>
+								<!-- v-if="auth('sysuser:reset')" -->
 								<el-dropdown-item
-									v-if="auth('sysuser:reset')"
 									icon="ele-RefreshLeft"
 									@click="
 										() => {
@@ -31,9 +34,9 @@
 								>
 									重置密码
 								</el-dropdown-item>
-								<el-dropdown-item v-if="auth('sysuser:delete')" icon="ele-Delete" :divided="auth('sysuser:reset')" @click="onDeleteUser(scope.row)">
-									删除账号
-								</el-dropdown-item>
+								<!-- v-if="auth('sysuser:delete')" -->
+								<!-- :divided="auth('sysuser:reset')" -->
+								<el-dropdown-item icon="ele-Delete" @click="onDeleteUser(scope.row)"> 删除账号 </el-dropdown-item>
 							</el-dropdown-menu>
 						</template>
 					</el-dropdown>
@@ -52,11 +55,8 @@ import { defineAsyncComponent, reactive, ref, computed, inject } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import ProTable from '@/components/ProTable/index.vue';
 import TreeFilter from '@/components/TreeFilter/index.vue';
-import SysUserApi from '@/api/SysUserApi';
-import SysOrganizationApi from '@/api/SysOrganizationApi';
-import { auths, auth } from '@/utils/authFunction';
 import type { ColumnProps } from '@/components/ProTable/interface';
-import { OrganizationSyssServiceProxy, TreeSelectOutput, UserSyssServiceProxy } from '@/shared/service-proxies';
+import { OrganizationSyssServiceProxy, QueryUserInput, TreeSelectOutput, UserSyssServiceProxy } from '@/shared/service-proxies';
 const _userSysService = new UserSyssServiceProxy(inject('$baseurl'), inject('$api'));
 const _orgSysService = new OrganizationSyssServiceProxy(inject('$baseurl'), inject('$api'));
 // 引入组件
@@ -70,7 +70,7 @@ const resetDialogRef = ref<InstanceType<typeof ResetDialog>>();
 const tableRef = ref<InstanceType<typeof ProTable>>();
 const orgTreeRef = ref<InstanceType<typeof TreeFilter>>();
 //机构数据
-const orgs = computed(() => orgTreeRef.value?.treeData ?? ([] as TreeSelectOutput[])); //orgTreeRef.value?.treeData ?? ([] as TreeSelectOutput[]);
+const orgs = computed(() => (orgTreeRef.value?.treeData as any) ?? ([] as TreeSelectOutput[])); //orgTreeRef.value?.treeData ?? ([] as TreeSelectOutput[]);
 const initParam = reactive<{ orgId?: number | string }>({ orgId: '' });
 
 // 机构熟选项发生改变事件
@@ -81,7 +81,7 @@ const onChangeTree = (val?: number | string) => {
 const columns: ColumnProps[] = [
 	{ type: 'index', label: '序号', width: 60 },
 	{
-		prop: 'account',
+		prop: 'userName',
 		label: '用户名',
 		align: 'center',
 		search: { el: 'input' },
@@ -134,9 +134,8 @@ const columns: ColumnProps[] = [
 ];
 
 const getTableList = (params: any) => {
-	console.log(params);
-	let newParams = JSON.parse(JSON.stringify(params));
-	return _userSysService.getPage(newParams.account, newParams.orgId, undefined, undefined, undefined, newParams.pageNo, newParams.pageSize);
+	let newParams = JSON.parse(JSON.stringify(params)) as QueryUserInput;
+	return _userSysService.pageData(newParams);
 };
 
 const getTreeTableList = (params: any) => {
@@ -145,7 +144,7 @@ const getTreeTableList = (params: any) => {
 };
 
 // 打开新增用户弹窗
-const onOpenUser = async (id: number) => {
+const onOpenUser = async (id: string) => {
 	await userDialogRef.value?.openDialog(id, orgs.value);
 };
 // 删除用户

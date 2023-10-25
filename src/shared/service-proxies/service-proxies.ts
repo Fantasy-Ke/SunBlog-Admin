@@ -1521,46 +1521,21 @@ export class UserSyssServiceProxy {
 
     /**
      * 系统用户分页查询
-     * @param userName (optional) 账号
-     * @param orgId (optional) 组织机构Id
-     * @param mobile (optional) 手机号
-     * @param name (optional) 姓名
-     * @param pageNo (optional) 
-     * @param pageSize (optional) 
+     * @param body (optional) 
      * @return Success
      */
-    getPage(userName: string | undefined, orgId: string | undefined, mobile: string | undefined, name: string | undefined, pageNo: number | undefined, pageSize: number | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<UserPageOutputPageResult>> {
-        let url_ = this.baseUrl + "/api/UserSyss/GetPage?";
-        if (userName === null)
-            throw new Error("The parameter 'userName' cannot be null.");
-        else if (userName !== undefined)
-            url_ += "UserName=" + encodeURIComponent("" + userName) + "&";
-        if (orgId === null)
-            throw new Error("The parameter 'orgId' cannot be null.");
-        else if (orgId !== undefined)
-            url_ += "OrgId=" + encodeURIComponent("" + orgId) + "&";
-        if (mobile === null)
-            throw new Error("The parameter 'mobile' cannot be null.");
-        else if (mobile !== undefined)
-            url_ += "Mobile=" + encodeURIComponent("" + mobile) + "&";
-        if (name === null)
-            throw new Error("The parameter 'name' cannot be null.");
-        else if (name !== undefined)
-            url_ += "Name=" + encodeURIComponent("" + name) + "&";
-        if (pageNo === null)
-            throw new Error("The parameter 'pageNo' cannot be null.");
-        else if (pageNo !== undefined)
-            url_ += "PageNo=" + encodeURIComponent("" + pageNo) + "&";
-        if (pageSize === null)
-            throw new Error("The parameter 'pageSize' cannot be null.");
-        else if (pageSize !== undefined)
-            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+    pageData(body: QueryUserInput | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<UserPageOutputPageResult>> {
+        let url_ = this.baseUrl + "/api/UserSyss/PageData";
         url_ = url_.replace(/[?&]$/, "");
 
+        const content_ = JSON.stringify(body);
+
         let options_: AxiosRequestConfig = {
-            method: "GET",
+            data: content_,
+            method: "POST",
             url: url_,
             headers: {
+                "Content-Type": "application/json",
                 "Accept": "text/plain"
             },
             cancelToken
@@ -1573,11 +1548,11 @@ export class UserSyssServiceProxy {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processGetPage(_response);
+            return this.processPageData(_response);
         });
     }
 
-    protected processGetPage(response: AxiosResponse): Promise<ZEngineResponse<UserPageOutputPageResult>> {
+    protected processPageData(response: AxiosResponse): Promise<ZEngineResponse<UserPageOutputPageResult>> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -9520,6 +9495,77 @@ export interface IPictureOutputPageResult {
     pages: number;
     total: number;
     rows: PictureOutput[] | undefined;
+}
+
+export class QueryUserInput implements IQueryUserInput {
+    pageNo: number;
+    pageSize: number;
+    /** 账号 */
+    userName: string | undefined;
+    /** 组织机构Id */
+    orgId: string | undefined;
+    /** 手机号 */
+    mobile: string | undefined;
+    /** 姓名 */
+    name: string | undefined;
+
+    constructor(data?: IQueryUserInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.pageNo = _data["pageNo"];
+            this.pageSize = _data["pageSize"];
+            this.userName = _data["userName"];
+            this.orgId = _data["orgId"];
+            this.mobile = _data["mobile"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): QueryUserInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new QueryUserInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["pageNo"] = this.pageNo;
+        data["pageSize"] = this.pageSize;
+        data["userName"] = this.userName;
+        data["orgId"] = this.orgId;
+        data["mobile"] = this.mobile;
+        data["name"] = this.name;
+        return data;
+    }
+
+    clone(): QueryUserInput {
+        const json = this.toJSON();
+        let result = new QueryUserInput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IQueryUserInput {
+    pageNo: number;
+    pageSize: number;
+    /** 账号 */
+    userName: string | undefined;
+    /** 组织机构Id */
+    orgId: string | undefined;
+    /** 手机号 */
+    mobile: string | undefined;
+    /** 姓名 */
+    name: string | undefined;
 }
 
 export class ReplyOutput implements IReplyOutput {

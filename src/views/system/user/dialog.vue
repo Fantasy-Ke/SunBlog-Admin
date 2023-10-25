@@ -5,7 +5,7 @@
 				<el-row :gutter="35">
 					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
 						<el-form-item label="用户名" prop="account">
-							<el-input v-model="state.ruleForm.account" placeholder="请输入账户名称" maxlength="32" clearable></el-input>
+							<el-input v-model="state.ruleForm.userName" placeholder="请输入账户名称" maxlength="32" clearable></el-input>
 						</el-form-item>
 					</el-col>
 					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
@@ -109,11 +109,11 @@
 </template>
 
 <script setup lang="ts" name="systemUserDialog">
-import { reactive, ref, nextTick } from 'vue';
-import { UpdateSysUserInput, TreeSelectOutput } from '@/api/models';
-import SysUserApi from '@/api/SysUserApi';
-import SysRoleApi from '@/api/SysRoleApi';
+import { reactive, ref, nextTick, inject } from 'vue';
 import { FormInstance, FormRules } from 'element-plus';
+import { RoleSyssServiceProxy, TreeSelectOutput, UpdateUserInput, UserSyssServiceProxy } from '@/shared/service-proxies';
+const _userSysService = new UserSyssServiceProxy(inject('$baseurl'), inject('$api'));
+const _roleSysService = new RoleSyssServiceProxy(inject('$baseurl'), inject('$api'));
 
 // 定义子组件向父组件传值/事件
 const emit = defineEmits(['refresh']);
@@ -123,7 +123,7 @@ const userDialogFormRef = ref<FormInstance>();
 // 表单验证规则
 const rules = reactive<FormRules>({
 	name: [{ required: true, message: '请输入姓名' }],
-	account: [{ required: true, message: '请输入用户名' }],
+	userName: [{ required: true, message: '请输入用户名' }],
 	orgId: [{ required: true, message: '请选择机构' }],
 	roles: [{ required: true, message: '请分配角色' }],
 	mobile: [
@@ -155,7 +155,7 @@ const state = reactive({
 	ruleForm: {
 		gender: 0,
 		status: 0,
-	} as UpdateSysUserInput,
+	} as UpdateUserInput,
 	deptData: [] as TreeSelectOutput[], // 部门数据
 	roleData: [] as TreeSelectOutput[], //角色下拉选项
 	dialog: {
@@ -167,19 +167,19 @@ const state = reactive({
 });
 
 // 打开弹窗
-const openDialog = async (id: number, orgs: TreeSelectOutput[]) => {
+const openDialog = async (id: string, orgs: TreeSelectOutput[]) => {
 	state.dialog.loading = true;
 	state.dialog.isShowDialog = true;
 	state.deptData = orgs;
-	const { data } = await SysRoleApi.getRoleSelect();
-	state.roleData = data ?? [];
-	if (id > 0) {
-		const { data: user } = await SysUserApi.getSysUserDetail(id);
+	const { result } = await _roleSysService.roleSelect();
+	state.roleData = (result as any) ?? [];
+	if (id) {
+		const { result: user } = await _userSysService.detail(id);
 		state.ruleForm = user;
 		state.dialog.title = '修改用户';
 		state.dialog.submitTxt = '修 改';
 	} else {
-		state.ruleForm.id = 0;
+		state.ruleForm.id = '';
 		state.dialog.title = '新增用户';
 		state.dialog.submitTxt = '新 增';
 		// 重置表单
@@ -201,8 +201,8 @@ const onCancel = () => {
 const onSubmit = () => {
 	userDialogFormRef.value?.validate(async (v) => {
 		if (!v) return;
-		const { succeeded } = state.ruleForm.id === 0 ? await SysUserApi.add(state.ruleForm) : await SysUserApi.edit(state.ruleForm);
-		if (succeeded) {
+		const { success } = state.ruleForm.id ? await _userSysService.addUser(state.ruleForm) : await _userSysService.updateUser(state.ruleForm);
+		if (success) {
 			closeDialog();
 			emit('refresh');
 		}
