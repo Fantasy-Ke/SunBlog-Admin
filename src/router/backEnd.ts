@@ -10,6 +10,10 @@ import { useRoutesList } from '@/stores/routesList';
 import { useTagsViewRoutes } from '@/stores/tagsViewRoutes';
 import SysMenuApi from '@/api/SysMenuApi';
 import { accessTokenKey } from '@/utils/request';
+import apiHttpClient from '@/utils/http';
+import { inject } from 'vue';
+import { MenusServiceProxy } from '@/shared/service-proxies';
+const _menuService = new MenusServiceProxy(inject('$baseurl'), apiHttpClient as any);
 
 // 后端控制路由
 
@@ -159,8 +163,9 @@ export async function setAddRoute() {
  * @description isRequestRoutes 为 true，则开启后端控制路由
  * @returns 返回后端路由菜单数据
  */
-export function getBackEndControlRoutes() {
-	return SysMenuApi.getMenus();
+export async function getBackEndControlRoutes() {
+	const { result } = await _menuService.permissionMenus();
+	return result;
 }
 
 /**
