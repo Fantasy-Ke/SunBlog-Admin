@@ -43,7 +43,7 @@ export async function initBackEndControlRoutes() {
 	// https://gitee.com/lyt-top/vue-next-admin/issues/I5F1HP
 	await useUserInfo().getUserInfo();
 	// 获取路由菜单数据
-	const { data } = await getBackEndControlRoutes();
+	const data = await getBackEndControlRoutes();
 	// 无登录权限时，添加判断
 	// https://gitee.com/lyt-top/vue-next-admin/issues/I64HVO
 	const routeList = data ?? [];

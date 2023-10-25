@@ -1,8 +1,8 @@
 <template>
 	<div class="system-user-container layout-padding main-box">
-		<TreeFilter ref="orgTreeRef" :request-api="SysOrganizationApi.getTreeSelect" id="value" :default-value="initParam.orgId" @change="onChangeTree" />
+		<TreeFilter ref="orgTreeRef" :request-api="getTreeTableList" id="value" :default-value="initParam.orgId" @change="onChangeTree" />
 		<div class="table-box">
-			<ProTable ref="proTableRef" :init-param="initParam" :columns="columns" :request-api="SysUserApi.page" :tool-button="false">
+			<ProTable ref="proTableRef" :init-param="initParam" :columns="columns" :request-api="getTableList" :tool-button="false">
 				<template #tools>
 					<el-button v-auth="'sysuser:add'" type="primary" icon="ele-Plus" @click="onOpenUser(0)">新增</el-button>
 				</template>
@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts" name="sysUser">
-import { defineAsyncComponent, reactive, ref, computed } from 'vue';
+import { defineAsyncComponent, reactive, ref, computed, inject } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import ProTable from '@/components/ProTable/index.vue';
 import TreeFilter from '@/components/TreeFilter/index.vue';
@@ -56,8 +56,9 @@ import SysUserApi from '@/api/SysUserApi';
 import SysOrganizationApi from '@/api/SysOrganizationApi';
 import { auths, auth } from '@/utils/authFunction';
 import type { ColumnProps } from '@/components/ProTable/interface';
-import type { TreeSelectOutput } from '@/api/models';
-
+import { OrganizationSyssServiceProxy, TreeSelectOutput, UserSyssServiceProxy } from '@/shared/service-proxies';
+const _userSysService = new UserSyssServiceProxy(inject('$baseurl'), inject('$api'));
+const _orgSysService = new OrganizationSyssServiceProxy(inject('$baseurl'), inject('$api'));
 // 引入组件
 const UserDialog = defineAsyncComponent(() => import('@/views/system/user/dialog.vue'));
 const ResetDialog = defineAsyncComponent(() => import('@/views/system/user/reset.vue'));
@@ -128,9 +129,20 @@ const columns: ColumnProps[] = [
 		align: 'center',
 		width: 120,
 		fixed: 'right',
-		isShow: auths(['sysuser:edit', 'sysuser:delete']),
+		// isShow: auths(['sysuser:edit', 'sysuser:delete']),
 	},
 ];
+
+const getTableList = (params: any) => {
+	console.log(params);
+	let newParams = JSON.parse(JSON.stringify(params));
+	return _userSysService.getPage(newParams.account, newParams.orgId, undefined, undefined, undefined, newParams.pageNo, newParams.pageSize);
+};
+
+const getTreeTableList = (params: any) => {
+	console.log(params);
+	return _orgSysService.treeSelect();
+};
 
 // 打开新增用户弹窗
 const onOpenUser = async (id: number) => {
@@ -144,8 +156,8 @@ const onDeleteUser = async (row: any) => {
 		type: 'warning',
 	})
 		.then(async () => {
-			const { succeeded } = await SysUserApi.delete({ id: row.id });
-			if (succeeded) {
+			const { success } = await _userSysService.delete(row.id);
+			if (success) {
 				ElMessage.success('删除成功');
 				tableRef.value?.reset();
 			}

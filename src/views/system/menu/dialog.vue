@@ -38,7 +38,7 @@
 							<el-input v-model="state.ruleForm.name" placeholder="菜单名称" clearable maxlength="32"></el-input>
 						</el-form-item>
 					</el-col>
-					<template v-if="state.ruleForm.type !== MenuType.NUMBER_2">
+					<template v-if="state.ruleForm.type !== MenuType._2">
 						<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
 							<el-form-item label="路由名称" prop="routeName">
 								<el-input v-model="state.ruleForm.routeName" placeholder="路由中的 name 值" clearable maxlength="32"></el-input>
@@ -56,7 +56,7 @@
 									placeholder="组件路径"
 									clearable
 									maxlength="128"
-									:disabled="state.ruleForm.type === MenuType.NUMBER_0"
+									:disabled="state.ruleForm.type === MenuType._0"
 								></el-input>
 							</el-form-item>
 						</el-col>
@@ -88,7 +88,7 @@
 							<el-input-number v-model="state.ruleForm.sort" controls-position="right" placeholder="请输入排序" class="w100" />
 						</el-form-item>
 					</el-col>
-					<template v-if="state.ruleForm.type !== MenuType.NUMBER_2">
+					<template v-if="state.ruleForm.type !== MenuType._2">
 						<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
 							<el-form-item label="可见" prop="isVisible">
 								<el-radio-group v-model="state.ruleForm.isVisible">
@@ -140,10 +140,10 @@
 </template>
 
 <script setup lang="ts" name="systemMenuDialog">
-import { defineAsyncComponent, reactive, ref, nextTick } from 'vue';
-import { AvailabilityStatus, MenuType, TreeSelectOutput, UpdateSysMenuInput } from '@/api/models';
-import SysMenuApi from '@/api/SysMenuApi';
+import { defineAsyncComponent, reactive, ref, nextTick, inject } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
+import { AvailabilityStatus, MenuType, MenusServiceProxy, TreeSelectOutput, UpdateSysMenuInput } from '@/shared/service-proxies';
+const _menuService = new MenusServiceProxy(inject('$baseurl'), inject('$api'));
 
 // 定义子组件向父组件传值/事件
 const emit = defineEmits(['refresh']);
@@ -165,7 +165,7 @@ const rules = reactive<FormRules>({
 		{
 			trigger: 'blur',
 			validator: (rule: any, value: string, callback: any) => {
-				if ((state.ruleForm.type !== MenuType.NUMBER_2 && value === undefined) || value === '') {
+				if ((state.ruleForm.type !== MenuType._2 && value === undefined) || value === '') {
 					callback(new Error('请输入路由名称'));
 				} else {
 					callback();
@@ -177,7 +177,7 @@ const rules = reactive<FormRules>({
 		{
 			trigger: 'blur',
 			validator: (rule: any, value: string, callback: any) => {
-				if ((state.ruleForm.type !== MenuType.NUMBER_2 && value === undefined) || value === '') {
+				if ((state.ruleForm.type !== MenuType._2 && value === undefined) || value === '') {
 					callback(new Error('请输入路由名称'));
 				} else {
 					callback();
@@ -208,16 +208,16 @@ const rules = reactive<FormRules>({
 const state = reactive({
 	// 参数请参考 `/src/router/route.ts` 中的 `dynamicRoutes` 路由菜单格式
 	ruleForm: {
-		id: 0,
-		type: MenuType.NUMBER_0,
-		status: AvailabilityStatus.NUMBER_0,
+		id: '',
+		type: MenuType._0,
+		status: AvailabilityStatus._0,
 		isFixed: false,
 		isKeepAlive: true,
 		isVisible: true,
 		isIframe: false,
 		sort: 100,
-	} as UpdateSysMenuInput,
-	menuData: [] as TreeSelectOutput, // 上级菜单数据
+	} as unknown as UpdateSysMenuInput,
+	menuData: [] as unknown as TreeSelectOutput, // 上级菜单数据
 	dialog: {
 		isShowDialog: false,
 		type: '',
@@ -228,18 +228,18 @@ const state = reactive({
 });
 
 // 打开弹窗
-const openDialog = async (id: number) => {
+const openDialog = async (id: string) => {
 	state.dialog.isShowDialog = true;
 	state.dialog.loading = true;
-	const { data } = await SysMenuApi.getTreeSelect();
-	state.menuData = data ?? ([] as TreeSelectOutput);
-	if (id > 0) {
+	const { result } = await _menuService.treeSelect();
+	state.menuData = (result as any) ?? ([] as unknown as TreeSelectOutput);
+	if (id) {
 		state.dialog.title = '修改菜单';
 		state.dialog.submitTxt = '修 改';
-		const { data } = await SysMenuApi.getMenuDetail(id!);
-		state.ruleForm = data! as UpdateSysMenuInput;
+		const { result } = await _menuService.detail(id!);
+		state.ruleForm = result! as UpdateSysMenuInput;
 	} else {
-		state.ruleForm.id = 0;
+		state.ruleForm.id = '';
 		state.dialog.title = '新增菜单';
 		state.dialog.submitTxt = '新 增';
 		// 清空表单，此项需加表单验证才能使用
@@ -261,8 +261,8 @@ const onCancel = () => {
 const onSubmit = async () => {
 	menuDialogFormRef.value?.validate(async (v) => {
 		if (v) {
-			const { succeeded } = state.ruleForm.id! > 0 ? await SysMenuApi.edit(state.ruleForm) : await SysMenuApi.add(state.ruleForm);
-			if (succeeded) {
+			const { success } = state.ruleForm.id ? await _menuService.updateMenu(state.ruleForm) : await _menuService.addMenu(state.ruleForm);
+			if (success) {
 				closeDialog(); // 关闭弹窗
 				emit('refresh'); //父级组件刷新列表
 			}
