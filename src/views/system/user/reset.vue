@@ -28,12 +28,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
-import { ResetPasswordInput } from '@/api/models';
+import { ref, reactive, inject } from 'vue';
 import { ElMessage, FormInstance, FormRules } from 'element-plus';
-import SysUserApi from '@/api/SysUserApi';
+import { ResetPasswordInput, UserSyssServiceProxy } from '@/shared/service-proxies';
 type resetPasswordType = ResetPasswordInput & { rePassword: string };
 const pwdDialogFormRef = ref<FormInstance>();
+const _userSysService = new UserSyssServiceProxy(inject('$baseurl'), inject('$api'));
 // 表单验证
 const rules = reactive<FormRules>({
 	password: [
@@ -68,7 +68,7 @@ const state = reactive({
 	},
 });
 
-const openDialog = (id: number) => {
+const openDialog = (id: string) => {
 	state.dialog.isShowDialog = true;
 	state.form.id = id;
 	pwdDialogFormRef.value?.resetFields();
@@ -79,9 +79,9 @@ const onSubmit = () => {
 	pwdDialogFormRef.value?.validate(async (v) => {
 		if (!v) return;
 		state.dialog.loading = true;
-		const { succeeded } = await SysUserApi.resetPassword(state.form);
+		const { success } = await _userSysService.reset(state.form);
 		state.dialog.loading = false;
-		if (succeeded) {
+		if (success) {
 			ElMessage.success('密码已重置');
 			state.dialog.isShowDialog = false;
 		}
