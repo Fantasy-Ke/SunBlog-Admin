@@ -59,7 +59,7 @@ const columns = reactive<ColumnProps[]>([
 	{ prop: 'code', label: '权限标识' },
 	{ prop: 'status', label: '状态' },
 	{ prop: 'sort', label: '排序' },
-	{ prop: 'createdTime', label: '创建时间' },
+	{ prop: 'creationTime', label: '创建时间' },
 	// isShow: auths(['sysmenu:edit', 'sysmenu:delete'])
 	{ prop: 'action', label: '操作', align: 'center', width: 150, fixed: 'right' },
 ]);
