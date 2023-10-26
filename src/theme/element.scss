@@ -257,24 +257,28 @@
 }
 
 .el-dialog__title{
-	font-size: 14px;
-	color: #FFF;
-	font-weight: 700;
+	font-size: 16px;
+	color: #000000;
+	font-weight: 600;
 }
 .el-dialog__header {
 	margin-right: 0;
-	padding-top: 10px;
-	background: var(--el-color-primary);
+	padding-top: 15px;
+	padding-bottom: 25px;
+	// background: var(--el-color-primary);
+  border-bottom: 1px solid var(--el-color-info-light-7);
 }
 .el-dialog__footer {
 	border-top: 1px solid var(--el-color-info-light-7);
 	padding-bottom: 10px;
+	padding-top: 20px;
+
   }
 .el-dialog__headerbtn{
 	height: 32px;
 	font-weight: 900;
 	.el-dialog__close{
-		color: #FFF;
+		color: #070707;
 	}
 }
 .el-dialog__headerbtn:hover .el-dialog__close{
