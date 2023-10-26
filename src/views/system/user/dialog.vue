@@ -1,6 +1,6 @@
 <template>
 	<div class="system-user-dialog-container">
-		<el-dialog :title="state.dialog.title" v-model="state.dialog.isShowDialog" width="769px">
+		<el-dialog :title="state.dialog.title" v-model="state.dialog.isShowDialog" width="60%">
 			<el-form ref="userDialogFormRef" :rules="rules" v-loading="state.dialog.loading" :model="state.ruleForm" size="default" label-width="90px">
 				<el-row :gutter="35">
 					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">

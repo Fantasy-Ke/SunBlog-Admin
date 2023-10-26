@@ -119,7 +119,7 @@ const columns: ColumnProps[] = [
 		align: 'center',
 	},
 	{
-		prop: 'createdTime',
+		prop: 'creationTime',
 		label: '创建时间',
 		align: 'center',
 	},
