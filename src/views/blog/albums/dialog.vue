@@ -79,11 +79,10 @@
 
 <script setup lang="ts" name="albumDialog">
 import type { FormInstance, FormRules } from 'element-plus';
-import { reactive, ref, nextTick } from 'vue';
-import type { UpdateAlbumsInput } from '@/api/models';
-import AlbumsApi from '@/api/AlbumsApi';
+import { reactive, ref, nextTick, inject } from 'vue';
 import UploadImg from '@/components/Upload/Img.vue';
-
+import { AlbumsSsServiceProxy, CreateOrUpdateAlbumsInput } from '@/shared/service-proxies';
+const _albumsService = new AlbumsSsServiceProxy(inject('$baseurl'), inject('$api'));
 // 定义子组件向父组件传值/事件
 const emit = defineEmits(['refresh']);
 
@@ -105,11 +104,11 @@ const rules = reactive<FormRules>({
 //表单状态
 const state = reactive({
 	ruleForm: {
-		id: 0,
+		id: '',
 		status: 0,
 		sort: 100,
 		isVisible: true,
-	} as UpdateAlbumsInput,
+	} as CreateOrUpdateAlbumsInput,
 	dialog: {
 		isShowDialog: false,
 		title: '',
@@ -120,16 +119,16 @@ const state = reactive({
 });
 
 // 打开弹窗
-const openDialog = async (row: UpdateAlbumsInput | null, types: string[]) => {
+const openDialog = async (row: CreateOrUpdateAlbumsInput | null, types: string[]) => {
 	state.dialog.isShowDialog = true;
 	state.dialog.loading = true;
 	state.albumType = types;
 	if (row != null) {
-		state.ruleForm = { ...row };
+		state.ruleForm = { ...row } as CreateOrUpdateAlbumsInput;
 		state.dialog.title = '修改相册';
 		state.dialog.submitTxt = '修 改';
 	} else {
-		state.ruleForm.id = 0;
+		state.ruleForm.id = '';
 		state.dialog.title = '新增相册';
 		state.dialog.submitTxt = '新 增';
 		// 重置表单
@@ -151,8 +150,10 @@ const onCancel = () => {
 const onSubmit = async () => {
 	albumDialogFormRef.value?.validate(async (v) => {
 		if (v) {
-			const { succeeded } = state.ruleForm.id === 0 ? await AlbumsApi.add(state.ruleForm) : await AlbumsApi.edit(state.ruleForm);
-			if (succeeded) {
+			const { success } = state.ruleForm.id
+				? await _albumsService.createOrUpdate(state.ruleForm)
+				: await _albumsService.createOrUpdate(state.ruleForm);
+			if (success) {
 				closeDialog();
 				emit('refresh');
 			}

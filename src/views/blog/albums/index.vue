@@ -48,7 +48,6 @@
 <script setup lang="ts" name="blogAlbums">
 import { defineAsyncComponent, inject, reactive, ref } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import type { UpdateAlbumsInput } from '@/api/models';
 import { auth, auths } from '@/utils/authFunction';
 
 // 引入组件
@@ -56,7 +55,7 @@ const AlbumDialog = defineAsyncComponent(() => import('./dialog.vue'));
 import ProTable from '@/components/ProTable/index.vue';
 import { ColumnProps } from '@/components/ProTable/interface';
 import { useRouter } from 'vue-router';
-import { AlbumsPageQueryInput, AlbumsSsServiceProxy } from '@/shared/service-proxies';
+import { AlbumsPageQueryInput, AlbumsSsServiceProxy, CreateOrUpdateAlbumsInput } from '@/shared/service-proxies';
 const _albumsService = new AlbumsSsServiceProxy(inject('$baseurl'), inject('$api'));
 const albumType = [
 	'首页封面图',
@@ -136,7 +135,7 @@ const getTableList = (params: any) => {
 	return _albumsService.getPage(newParams);
 };
 // 打开新增标签弹窗
-const onOpen = (row: UpdateAlbumsInput | null) => {
+const onOpen = (row: CreateOrUpdateAlbumsInput | null) => {
 	albumDialogRef.value?.openDialog(row, albumType);
 };
 
@@ -148,7 +147,7 @@ const onDeleteRole = async (row: any) => {
 		type: 'warning',
 	})
 		.then(async () => {
-			const { success } = await _albumsService.delete({ id: row.id });
+			const { success } = await _albumsService.delete(row.id);
 			if (success) {
 				ElMessage.success('删除成功');
 				tableRef.value?.reset();
