@@ -1,6 +1,6 @@
 <template>
 	<div class="system-dept-dialog-container">
-		<el-dialog :title="state.dialog.title" v-model="state.dialog.isShowDialog" width="769px">
+		<el-dialog :title="state.dialog.title" v-model="state.dialog.isShowDialog" width="60%">
 			<el-form :rules="rules" v-loading="state.dialog.loading" ref="deptDialogFormRef" :model="state.ruleForm" size="default" label-width="90px">
 				<el-row :gutter="35">
 					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
@@ -61,11 +61,11 @@
 </template>
 
 <script setup lang="ts" name="systemDeptDialog">
-import { reactive, ref, nextTick } from 'vue';
-import type { UpdateOrgInput, TreeSelectOutput } from '@/api/models';
-import SysOrganizationApi from '@/api/SysOrganizationApi';
+import { reactive, ref, nextTick, inject } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
+import { OrganizationSyssServiceProxy, TreeSelectOutput, UpdateOrgInput } from '@/shared/service-proxies';
 
+const _orgSysService = new OrganizationSyssServiceProxy(inject('$baseurl'), inject('$api'));
 // 定义子组件向父组件传值/事件
 const emit = defineEmits(['refresh']);
 
@@ -93,7 +93,7 @@ const rules = reactive<FormRules>({
 });
 const state = reactive({
 	ruleForm: {
-		id: 0,
+		id: '',
 		status: 0,
 		sort: 100,
 	} as UpdateOrgInput,
@@ -110,11 +110,11 @@ const state = reactive({
 // 打开弹窗
 const openDialog = async (row: UpdateOrgInput | null = null) => {
 	if (row !== null) {
-		state.ruleForm = { ...row };
+		state.ruleForm = { ...row } as UpdateOrgInput;
 		state.dialog.title = '修改部门';
 		state.dialog.submitTxt = '修 改';
 	} else {
-		state.ruleForm.id = 0;
+		state.ruleForm.id = '';
 		state.dialog.title = '新增部门';
 		state.dialog.submitTxt = '新 增';
 		nextTick(() => {
@@ -122,8 +122,8 @@ const openDialog = async (row: UpdateOrgInput | null = null) => {
 		});
 	}
 	state.dialog.isShowDialog = true;
-	const { data } = await SysOrganizationApi.getTreeSelect();
-	state.deptData = data ?? [];
+	const { result } = await _orgSysService.treeSelect();
+	state.deptData = (result as any) ?? [];
 	state.dialog.loading = false;
 };
 // 关闭弹窗
@@ -138,8 +138,8 @@ const onCancel = () => {
 const onSubmit = () => {
 	deptDialogFormRef.value!.validate(async (v) => {
 		if (v) {
-			const { succeeded } = state.ruleForm.id! > 0 ? await SysOrganizationApi.edit(state.ruleForm) : await SysOrganizationApi.add(state.ruleForm);
-			if (succeeded) {
+			const { success } = state.ruleForm.id ? await _orgSysService.updateOrg(state.ruleForm) : await _orgSysService.addOrg(state.ruleForm);
+			if (success) {
 				closeDialog();
 				emit('refresh');
 			}
