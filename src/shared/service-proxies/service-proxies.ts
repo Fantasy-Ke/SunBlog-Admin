@@ -583,73 +583,6 @@ export class ServiceProxy {
         }
         return Promise.resolve<ZEngineResponse<void>>(null as any);
     }
-
-    /**
-     * 获取角色可访问的菜单和按钮id
-     * @param id (optional) 角色id
-     * @return Success
-     */
-    getRuleMenu(id: string | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<string[]>> {
-        let url_ = this.baseUrl + "/getRuleMenu?";
-        if (id === null)
-            throw new Error("The parameter 'id' cannot be null.");
-        else if (id !== undefined)
-            url_ += "id=" + encodeURIComponent("" + id) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "text/plain"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processGetRuleMenu(_response);
-        });
-    }
-
-    protected processGetRuleMenu(response: AxiosResponse): Promise<ZEngineResponse<string[]>> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (let k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let result200Data: any = null;
-            let resultData200  = _responseText.result;
-            if (Array.isArray(resultData200)) {
-                result200 = [] as any;
-                for (let item of resultData200)
-                    result200.push(item);
-            }
-            else {
-                result200 = <any>null;
-            }
-            result200Data = ZEngineResponse.fromJS(_responseText);
-            result200Data.result = result200;
-            return Promise.resolve<ZEngineResponse<string[]>>(result200Data);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<ZEngineResponse<string[]>>(null as any);
-    }
 }
 
 export class UsersServiceProxy {
@@ -2027,31 +1960,21 @@ export class RoleSyssServiceProxy {
 
     /**
      * 角色分页查询
-     * @param name (optional) 角色名称
-     * @param pageNo (optional) 
-     * @param pageSize (optional) 
+     * @param body (optional) 
      * @return Success
      */
-    getPage(name: string | undefined, pageNo: number | undefined, pageSize: number | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<RolePageOutputPageResult>> {
-        let url_ = this.baseUrl + "/api/RoleSyss/GetPage?";
-        if (name === null)
-            throw new Error("The parameter 'name' cannot be null.");
-        else if (name !== undefined)
-            url_ += "Name=" + encodeURIComponent("" + name) + "&";
-        if (pageNo === null)
-            throw new Error("The parameter 'pageNo' cannot be null.");
-        else if (pageNo !== undefined)
-            url_ += "PageNo=" + encodeURIComponent("" + pageNo) + "&";
-        if (pageSize === null)
-            throw new Error("The parameter 'pageSize' cannot be null.");
-        else if (pageSize !== undefined)
-            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+    getPage(body: RoleQueryInput | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<RolePageOutputPageResult>> {
+        let url_ = this.baseUrl + "/api/RoleSyss/GetPage";
         url_ = url_.replace(/[?&]$/, "");
 
+        const content_ = JSON.stringify(body);
+
         let options_: AxiosRequestConfig = {
-            method: "GET",
+            data: content_,
+            method: "POST",
             url: url_,
             headers: {
+                "Content-Type": "application/json",
                 "Accept": "text/plain"
             },
             cancelToken
@@ -2199,6 +2122,73 @@ export class RoleSyssServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<ZEngineResponse<void>>(null as any);
+    }
+
+    /**
+     * 获取角色可访问的菜单和按钮id
+     * @param id (optional) 角色id
+     * @return Success
+     */
+    getRuleMenu(id: string | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<string[]>> {
+        let url_ = this.baseUrl + "/api/RoleSyss/GetRuleMenu?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetRuleMenu(_response);
+        });
+    }
+
+    protected processGetRuleMenu(response: AxiosResponse): Promise<ZEngineResponse<string[]>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let result200Data: any = null;
+            let resultData200  = _responseText.result;
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(item);
+            }
+            else {
+                result200 = <any>null;
+            }
+            result200Data = ZEngineResponse.fromJS(_responseText);
+            result200Data.result = result200;
+            return Promise.resolve<ZEngineResponse<string[]>>(result200Data);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<string[]>>(null as any);
     }
 
     /**
@@ -2385,21 +2375,21 @@ export class OrganizationSyssServiceProxy {
 
     /**
      * 组织机构列表查询
-     * @param name (optional) 
+     * @param body (optional) 
      * @return Success
      */
-    getPage(name: string | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<SysOrgPageOutput[]>> {
-        let url_ = this.baseUrl + "/api/OrganizationSyss/GetPage?";
-        if (name === null)
-            throw new Error("The parameter 'name' cannot be null.");
-        else if (name !== undefined)
-            url_ += "name=" + encodeURIComponent("" + name) + "&";
+    getPage(body: string | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<SysOrgPageOutput[]>> {
+        let url_ = this.baseUrl + "/api/OrganizationSyss/GetPage";
         url_ = url_.replace(/[?&]$/, "");
 
+        const content_ = JSON.stringify(body);
+
         let options_: AxiosRequestConfig = {
-            method: "GET",
+            data: content_,
+            method: "POST",
             url: url_,
             headers: {
+                "Content-Type": "application/json",
                 "Accept": "text/plain"
             },
             cancelToken
@@ -2616,6 +2606,59 @@ export class OrganizationSyssServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<ZEngineResponse<TreeSelectOutput[]>>(null as any);
+    }
+
+    /**
+     * 删除菜单/按钮
+     * @param id (optional) 
+     * @return Success
+     */
+    delete(id: string | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
+        let url_ = this.baseUrl + "/api/OrganizationSyss/Delete?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "DELETE",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDelete(_response);
+        });
+    }
+
+    protected processDelete(response: AxiosResponse): Promise<ZEngineResponse<void>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<ZEngineResponse<void>>(_responseText);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<void>>(null as any);
     }
 }
 
@@ -9959,6 +10002,59 @@ export interface IRolePageOutputPageResult {
     rows: RolePageOutput[] | undefined;
 }
 
+export class RoleQueryInput implements IRoleQueryInput {
+    pageNo: number;
+    pageSize: number;
+    /** 角色名称 */
+    name: string | undefined;
+
+    constructor(data?: IRoleQueryInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.pageNo = _data["pageNo"];
+            this.pageSize = _data["pageSize"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): RoleQueryInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new RoleQueryInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["pageNo"] = this.pageNo;
+        data["pageSize"] = this.pageSize;
+        data["name"] = this.name;
+        return data;
+    }
+
+    clone(): RoleQueryInput {
+        const json = this.toJSON();
+        let result = new RoleQueryInput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IRoleQueryInput {
+    pageNo: number;
+    pageSize: number;
+    /** 角色名称 */
+    name: string | undefined;
+}
+
 export class RouterMetaOutput implements IRouterMetaOutput {
     /** 标题 */
     title: string | undefined;
@@ -10115,8 +10211,7 @@ export interface IRouterOutput {
 
 export class SelectOutput implements ISelectOutput {
     label: string | undefined;
-    value: string;
-    value2: string | undefined;
+    value: any | undefined;
 
     constructor(data?: ISelectOutput) {
         if (data) {
@@ -10131,7 +10226,6 @@ export class SelectOutput implements ISelectOutput {
         if (_data) {
             this.label = _data["label"];
             this.value = _data["value"];
-            this.value2 = _data["value2"];
         }
     }
 
@@ -10146,7 +10240,6 @@ export class SelectOutput implements ISelectOutput {
         data = typeof data === 'object' ? data : {};
         data["label"] = this.label;
         data["value"] = this.value;
-        data["value2"] = this.value2;
         return data;
     }
 
@@ -10160,8 +10253,7 @@ export class SelectOutput implements ISelectOutput {
 
 export interface ISelectOutput {
     label: string | undefined;
-    value: string;
-    value2: string | undefined;
+    value: any | undefined;
 }
 
 export class SysOrgPageOutput implements ISysOrgPageOutput {
@@ -10979,8 +11071,7 @@ export interface ITalksPageQueryInput {
 
 export class TreeSelectOutput implements ITreeSelectOutput {
     label: string | undefined;
-    value: string;
-    value2: string | undefined;
+    value: any | undefined;
     children: TreeSelectOutput[] | undefined;
 
     constructor(data?: ITreeSelectOutput) {
@@ -10996,7 +11087,6 @@ export class TreeSelectOutput implements ITreeSelectOutput {
         if (_data) {
             this.label = _data["label"];
             this.value = _data["value"];
-            this.value2 = _data["value2"];
             if (Array.isArray(_data["children"])) {
                 this.children = [] as any;
                 for (let item of _data["children"])
@@ -11016,7 +11106,6 @@ export class TreeSelectOutput implements ITreeSelectOutput {
         data = typeof data === 'object' ? data : {};
         data["label"] = this.label;
         data["value"] = this.value;
-        data["value2"] = this.value2;
         if (Array.isArray(this.children)) {
             data["children"] = [];
             for (let item of this.children)
@@ -11035,8 +11124,7 @@ export class TreeSelectOutput implements ITreeSelectOutput {
 
 export interface ITreeSelectOutput {
     label: string | undefined;
-    value: string;
-    value2: string | undefined;
+    value: any | undefined;
     children: TreeSelectOutput[] | undefined;
 }
 
