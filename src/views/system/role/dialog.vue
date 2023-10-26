@@ -1,6 +1,6 @@
 <template>
 	<div class="system-role-dialog-container">
-		<el-dialog :title="state.dialog.title" v-model="state.dialog.isShowDialog" width="769px">
+		<el-dialog :title="state.dialog.title" v-model="state.dialog.isShowDialog" width="60%">
 			<el-form ref="roleDialogFormRef" :rules="rules" :model="state.ruleForm" v-loading="state.dialog.loading" size="default" label-width="90px">
 				<el-row :gutter="35">
 					<el-col :xs="24" :sm="12" :md="12" :lg="12" :xl="12" class="mb20">
@@ -63,10 +63,10 @@
 
 <script setup lang="ts" name="systemRoleDialog">
 import { FormInstance, FormRules, ElTree } from 'element-plus';
-import { reactive, ref, nextTick } from 'vue';
-import { TreeSelectOutput, UpdateSysRoleInput } from '@/api/models';
-import SysRoleApi from '@/api/SysRoleApi';
-import SysMenuApi from '@/api/SysMenuApi';
+import { reactive, ref, nextTick, inject } from 'vue';
+import { MenusServiceProxy, RoleSyssServiceProxy, TreeSelectOutput, UpdateSysRoleInput } from '@/shared/service-proxies';
+const _roleSysService = new RoleSyssServiceProxy(inject('$baseurl'), inject('$api'));
+const _menuService = new MenusServiceProxy(inject('$baseurl'), inject('$api'));
 
 // 定义子组件向父组件传值/事件
 const emit = defineEmits(['refresh']);
@@ -114,17 +114,17 @@ const state = reactive({
 const openDialog = async (row: UpdateSysRoleInput | null) => {
 	state.dialog.isShowDialog = true;
 	state.dialog.loading = true;
-	const { data: menus } = await SysMenuApi.getTreeMenuButton();
+	const { result: menus } = await _menuService.treeMenuButton();
 	state.menuData = menus ?? [];
 	if (row != null) {
-		state.ruleForm = { ...row };
-		const { data } = await SysRoleApi.getRuleMenu(row.id!);
-		state.ruleForm.menus = data ?? [];
+		state.ruleForm = { ...row } as UpdateSysRoleInput;
+		const { result } = await _roleSysService.getRuleMenu(row.id!);
+		state.ruleForm.menus = result ?? [];
 		state.dialog.title = '修改角色';
 		state.dialog.submitTxt = '修 改';
-		treeRef.value?.setCheckedKeys(data ?? []);
+		treeRef.value?.setCheckedKeys(result ?? []);
 	} else {
-		state.ruleForm.id = 0;
+		state.ruleForm.id = '';
 		state.dialog.title = '新增角色';
 		state.dialog.submitTxt = '新 增';
 		// 重置表单
@@ -144,11 +144,11 @@ const onCancel = () => {
 };
 // 提交
 const onSubmit = async () => {
-	state.ruleForm.menus = treeRef.value!.getCheckedKeys() as number[];
+	state.ruleForm.menus = treeRef.value!.getCheckedKeys() as string[];
 	roleDialogFormRef.value?.validate(async (v) => {
 		if (v) {
-			const { succeeded } = state.ruleForm.id === 0 ? await SysRoleApi.add(state.ruleForm) : await SysRoleApi.edit(state.ruleForm);
-			if (succeeded) {
+			const { success } = state.ruleForm.id ? await _roleSysService.updateRole(state.ruleForm) : await _roleSysService.addRole(state.ruleForm);
+			if (success) {
 				closeDialog();
 				emit('refresh');
 			}
