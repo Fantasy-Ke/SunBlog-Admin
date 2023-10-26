@@ -5,7 +5,7 @@
 			<ProTable ref="proTableRef" :init-param="initParam" :columns="columns" :request-api="getTableList" :tool-button="true">
 				<template #tools>
 					<!-- v-auth="'sysuser:add'" -->
-					<el-button type="primary" icon="ele-Plus" @click="onOpenUser(0)">新增</el-button>
+					<el-button type="primary" icon="ele-Plus" @click="onOpenUser('')">新增</el-button>
 				</template>
 				<template #status="scope">
 					<el-tag :type="scope.row.status === 0 ? 'success' : 'danger'"> {{ scope.row.status === 0 ? '启用' : '禁用' }}</el-tag>
