@@ -1,6 +1,6 @@
 <template>
 	<div class="blog-album-container layout-padding">
-		<ProTable ref="tableRef" :request-api="AlbumsApi.page" :columns="columns" :tool-button="false">
+		<ProTable ref="tableRef" :request-api="getTableList" :columns="columns" :tool-button="false">
 			<template #tools> <el-button type="primary" v-auth="'albums:add'" icon="ele-Plus" @click="onOpen(null)"> 新增 </el-button></template>
 			<template #status="scope">
 				<el-tag :type="scope.row.status === 0 ? 'success' : 'danger'"> {{ scope.row.status === 0 ? '启用' : '禁用' }}</el-tag>
@@ -46,9 +46,8 @@
 </template>
 
 <script setup lang="ts" name="blogAlbums">
-import { defineAsyncComponent, reactive, ref } from 'vue';
+import { defineAsyncComponent, inject, reactive, ref } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import AlbumsApi from '@/api/AlbumsApi';
 import type { UpdateAlbumsInput } from '@/api/models';
 import { auth, auths } from '@/utils/authFunction';
 
@@ -57,6 +56,8 @@ const AlbumDialog = defineAsyncComponent(() => import('./dialog.vue'));
 import ProTable from '@/components/ProTable/index.vue';
 import { ColumnProps } from '@/components/ProTable/interface';
 import { useRouter } from 'vue-router';
+import { AlbumsPageQueryInput, AlbumsSsServiceProxy } from '@/shared/service-proxies';
+const _albumsService = new AlbumsSsServiceProxy(inject('$baseurl'), inject('$api'));
 const albumType = [
 	'首页封面图',
 	'归档封面图',
@@ -129,6 +130,11 @@ const columns = reactive<ColumnProps[]>([
 		isShow: auths(['albums:edit', 'albums:delete']),
 	},
 ]);
+
+const getTableList = (params: any) => {
+	let newParams = JSON.parse(JSON.stringify(params)) as AlbumsPageQueryInput;
+	return _albumsService.getPage(newParams);
+};
 // 打开新增标签弹窗
 const onOpen = (row: UpdateAlbumsInput | null) => {
 	albumDialogRef.value?.openDialog(row, albumType);
@@ -142,8 +148,8 @@ const onDeleteRole = async (row: any) => {
 		type: 'warning',
 	})
 		.then(async () => {
-			const { succeeded } = await AlbumsApi.delete({ id: row.id });
-			if (succeeded) {
+			const { success } = await _albumsService.delete({ id: row.id });
+			if (success) {
 				ElMessage.success('删除成功');
 				tableRef.value?.reset();
 			}

@@ -24,13 +24,15 @@
 </template>
 
 <script setup lang="ts" name="friendLink">
-import { reactive, ref } from 'vue';
+import { inject, reactive, ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import AuthAccountApi from '@/api/AuthAccountApi';
 import { auth } from '@/utils/authFunction';
 
 import ProTable from '@/components/ProTable/index.vue';
 import { ColumnProps } from '@/components/ProTable/interface';
+import { OAuthsServiceProxy } from '@/shared/service-proxies';
+const _oauthsService = new OAuthsServiceProxy(inject('$baseurl'), inject('$api'));
 const loading = ref(false);
 //  table实例
 const tableRef = ref<InstanceType<typeof ProTable>>();
@@ -73,7 +75,7 @@ const columns = reactive<ColumnProps[]>([
 
 const onChange = async (id: number) => {
 	loading.value = true;
-	const { succeeded } = await AuthAccountApi.setBlogger(id);
+	const { succeeded } = await _oauthsService.setBlogger(id);
 	loading.value = false;
 	if (succeeded) {
 		tableRef.value?.reset();

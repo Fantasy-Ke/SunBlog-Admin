@@ -22,13 +22,13 @@
 						<div class="personal-user-right">
 							<el-row>
 								<el-col :span="24" class="personal-title mb18"
-									>{{ currentTime }}，{{ model.info.account }}，生活变的再糟糕，也不妨碍我变得更好！
+									>{{ currentTime }}，{{ model.info.userName }}，生活变的再糟糕，也不妨碍我变得更好！
 								</el-col>
 								<el-col :span="24">
 									<el-row>
 										<el-col :xs="24" :sm="8" class="personal-item mb6">
 											<div class="personal-item-label">登录名：</div>
-											<div class="personal-item-value">{{ model.info.account }}</div>
+											<div class="personal-item-value">{{ model.info.userName }}</div>
 										</el-col>
 										<el-col :xs="24" :sm="16" class="personal-item mb6">
 											<div class="personal-item-label">姓名：</div>
@@ -234,12 +234,12 @@
 </template>
 
 <script setup lang="ts" name="personal">
-import { ref, reactive, computed, onMounted } from 'vue';
+import { ref, reactive, computed, onMounted, inject } from 'vue';
 import { formatAxis } from '@/utils/formatTime';
-import SysUserApi from '@/api/SysUserApi';
-import type { ChangePasswordOutput, SysUserInfoOutput, UpdateCurrentUserInput } from '@/api/models';
 import { useUserInfo } from '@/stores/userInfo';
 import { type FormRules, type FormInstance, ElMessage } from 'element-plus';
+import { ChangePasswordOutput, UpdateUserInput, UserInfoOutput, UserSyssServiceProxy } from '@/shared/service-proxies';
+const _userSysService = new UserSyssServiceProxy(inject('$baseurl'), inject('$api'));
 const pwdRules = reactive<FormRules>({
 	originalPwd: [{ required: true, message: '请输入原密码' }],
 	password: [{ required: true, message: '请输入新密码' }],
@@ -257,18 +257,18 @@ const userInfoFormRef = ref<FormInstance>();
 const storeUser = useUserInfo();
 // 定义变量内容
 const state = reactive({
-	user: {} as UpdateCurrentUserInput,
+	user: {} as UpdateUserInput,
 });
 
 const model = reactive({
-	info: {} as SysUserInfoOutput, //当前用户信息
+	info: {} as UserInfoOutput, //当前用户信息
 	pwd: {} as ChangePasswordOutput,
 });
 const onChangePwd = () => {
 	pwdFormRef.value?.validate(async (valid) => {
 		if (valid) {
-			const { succeeded } = await SysUserApi.changePassword(model.pwd);
-			if (succeeded) {
+			const { success } = await _userSysService.changePassword(model.pwd);
+			if (success) {
 				ElMessage.success('修改成功，下次登录请使用新密码！');
 				pwdFormRef.value?.resetFields();
 			}
@@ -279,8 +279,8 @@ const onChangePwd = () => {
 const onSave = async () => {
 	userInfoFormRef.value?.validate(async (valid) => {
 		if (valid) {
-			const { succeeded } = await SysUserApi.updateCurrentUser(state.user);
-			if (succeeded) {
+			const { success } = await _userSysService.updateUser(state.user);
+			if (success) {
 				ElMessage.success('修改成功');
 				await storeUser.getUserInfo();
 			}
@@ -289,22 +289,22 @@ const onSave = async () => {
 };
 // 上传头像回调
 const onSuccess = async (response: any) => {
-	const { succeeded } = await SysUserApi.setAvatar(response[0].url);
-	if (succeeded) {
+	const { success } = await _userSysService.uploadAvatar(response[0].url);
+	if (success) {
 		model.info.avatar = response[0].url;
 		await storeUser.getUserInfo();
 		ElMessage.success('修改头像成功');
 	}
 };
 onMounted(async () => {
-	const { data } = await SysUserApi.getCurrentUserInfo();
-	model.info = data!;
-	state.user.birthday = data?.birthday;
-	state.user.name = data!.name!;
-	state.user.email = data?.email;
-	state.user.mobile = data?.mobile;
-	state.user.gender = data?.gender;
-	state.user.nickName = data?.nickName;
+	const { result } = await _userSysService.currentUserInfo();
+	model.info = result!;
+	state.user.birthday = result?.birthday;
+	state.user.name = result!.name!;
+	state.user.email = result?.email;
+	state.user.mobile = result?.mobile;
+	state.user.gender = result?.gender;
+	state.user.nickName = result?.nickName;
 });
 
 // 当前时间提示语
