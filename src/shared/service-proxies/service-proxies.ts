@@ -2662,6 +2662,186 @@ export class OrganizationSyssServiceProxy {
     }
 }
 
+export class AuthAccountsServiceProxy {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * 博客授权用户列表
+     * @param body (optional) 
+     * @return Success
+     */
+    getList(body: AuthAccountPageQueryInput | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<AuthAccountPageOutputPageResult>> {
+        let url_ = this.baseUrl + "/api/AuthAccounts/GetList";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetList(_response);
+        });
+    }
+
+    protected processGetList(response: AxiosResponse): Promise<ZEngineResponse<AuthAccountPageOutputPageResult>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let result200Data: any = null;
+            let resultData200  = _responseText.result;
+            result200 = AuthAccountPageOutputPageResult.fromJS(resultData200);
+            result200Data = ZEngineResponse.fromJS(_responseText);
+            result200Data.result = result200;
+            return Promise.resolve<ZEngineResponse<AuthAccountPageOutputPageResult>>(result200Data);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<AuthAccountPageOutputPageResult>>(null as any);
+    }
+
+    /**
+     * 设置博主
+     * @param id (optional) 
+     * @return Success
+     */
+    setBlogger(id: string | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
+        let url_ = this.baseUrl + "/api/AuthAccounts/SetBlogger?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "PATCH",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processSetBlogger(_response);
+        });
+    }
+
+    protected processSetBlogger(response: AxiosResponse): Promise<ZEngineResponse<void>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<ZEngineResponse<void>>(_responseText);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<void>>(null as any);
+    }
+
+    /**
+     * 删除博客用户
+     * @param id (optional) 
+     * @return Success
+     */
+    delete(id: string | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
+        let url_ = this.baseUrl + "/api/AuthAccounts/Delete?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "DELETE",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDelete(_response);
+        });
+    }
+
+    protected processDelete(response: AxiosResponse): Promise<ZEngineResponse<void>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<ZEngineResponse<void>>(_responseText);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<void>>(null as any);
+    }
+}
+
 export class OAuthsServiceProxy {
     protected instance: AxiosInstance;
     protected baseUrl: string;
@@ -7219,6 +7399,205 @@ export interface IArticleReportOutput {
     linkCount: number;
 }
 
+export class AuthAccountPageOutput implements IAuthAccountPageOutput {
+    /** 主键 */
+    id: string | undefined;
+    /** 昵称 */
+    name: string | undefined;
+    gender: Gender;
+    /** 授权类型 */
+    type: string | undefined;
+    /** 是否是博主 */
+    isBlogger: boolean;
+    /** 头像 */
+    avatar: string | undefined;
+    /** 注册时间 */
+    createdTime: moment.Moment | undefined;
+
+    constructor(data?: IAuthAccountPageOutput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.gender = _data["gender"];
+            this.type = _data["type"];
+            this.isBlogger = _data["isBlogger"];
+            this.avatar = _data["avatar"];
+            this.createdTime = _data["createdTime"] ? moment(_data["createdTime"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): AuthAccountPageOutput {
+        data = typeof data === 'object' ? data : {};
+        let result = new AuthAccountPageOutput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["gender"] = this.gender;
+        data["type"] = this.type;
+        data["isBlogger"] = this.isBlogger;
+        data["avatar"] = this.avatar;
+        data["createdTime"] = this.createdTime ? this.createdTime.toISOString() : <any>undefined;
+        return data;
+    }
+
+    clone(): AuthAccountPageOutput {
+        const json = this.toJSON();
+        let result = new AuthAccountPageOutput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IAuthAccountPageOutput {
+    /** 主键 */
+    id: string | undefined;
+    /** 昵称 */
+    name: string | undefined;
+    gender: Gender;
+    /** 授权类型 */
+    type: string | undefined;
+    /** 是否是博主 */
+    isBlogger: boolean;
+    /** 头像 */
+    avatar: string | undefined;
+    /** 注册时间 */
+    createdTime: moment.Moment | undefined;
+}
+
+export class AuthAccountPageOutputPageResult implements IAuthAccountPageOutputPageResult {
+    pageNo: number;
+    pageSize: number;
+    pages: number;
+    total: number;
+    rows: AuthAccountPageOutput[] | undefined;
+
+    constructor(data?: IAuthAccountPageOutputPageResult) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.pageNo = _data["pageNo"];
+            this.pageSize = _data["pageSize"];
+            this.pages = _data["pages"];
+            this.total = _data["total"];
+            if (Array.isArray(_data["rows"])) {
+                this.rows = [] as any;
+                for (let item of _data["rows"])
+                    this.rows.push(AuthAccountPageOutput.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): AuthAccountPageOutputPageResult {
+        data = typeof data === 'object' ? data : {};
+        let result = new AuthAccountPageOutputPageResult();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["pageNo"] = this.pageNo;
+        data["pageSize"] = this.pageSize;
+        data["pages"] = this.pages;
+        data["total"] = this.total;
+        if (Array.isArray(this.rows)) {
+            data["rows"] = [];
+            for (let item of this.rows)
+                data["rows"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): AuthAccountPageOutputPageResult {
+        const json = this.toJSON();
+        let result = new AuthAccountPageOutputPageResult();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IAuthAccountPageOutputPageResult {
+    pageNo: number;
+    pageSize: number;
+    pages: number;
+    total: number;
+    rows: AuthAccountPageOutput[] | undefined;
+}
+
+export class AuthAccountPageQueryInput implements IAuthAccountPageQueryInput {
+    pageNo: number;
+    pageSize: number;
+    /** 昵称 */
+    name: string | undefined;
+
+    constructor(data?: IAuthAccountPageQueryInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.pageNo = _data["pageNo"];
+            this.pageSize = _data["pageSize"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): AuthAccountPageQueryInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new AuthAccountPageQueryInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["pageNo"] = this.pageNo;
+        data["pageSize"] = this.pageSize;
+        data["name"] = this.name;
+        return data;
+    }
+
+    clone(): AuthAccountPageQueryInput {
+        const json = this.toJSON();
+        let result = new AuthAccountPageQueryInput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IAuthAccountPageQueryInput {
+    pageNo: number;
+    pageSize: number;
+    /** 昵称 */
+    name: string | undefined;
+}
+
 export class AvailabilityDto implements IAvailabilityDto {
     id: string | undefined;
     gId: string | undefined;
@@ -11737,6 +12116,8 @@ export interface IUpdateUserInput {
 }
 
 export class UserInfoOutput implements IUserInfoOutput {
+    /** Id */
+    id: string | undefined;
     /** 姓名 */
     name: string | undefined;
     /** 账户名 */
@@ -11776,6 +12157,7 @@ export class UserInfoOutput implements IUserInfoOutput {
 
     init(_data?: any) {
         if (_data) {
+            this.id = _data["id"];
             this.name = _data["name"];
             this.userName = _data["userName"];
             this.avatar = _data["avatar"];
@@ -11806,6 +12188,7 @@ export class UserInfoOutput implements IUserInfoOutput {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
         data["name"] = this.name;
         data["userName"] = this.userName;
         data["avatar"] = this.avatar;
@@ -11836,6 +12219,8 @@ export class UserInfoOutput implements IUserInfoOutput {
 }
 
 export interface IUserInfoOutput {
+    /** Id */
+    id: string | undefined;
     /** 姓名 */
     name: string | undefined;
     /** 账户名 */

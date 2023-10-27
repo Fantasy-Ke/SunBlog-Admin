@@ -1,6 +1,6 @@
 <template>
 	<div class="blog-account-container layout-padding">
-		<ProTable ref="tableRef" :request-api="AuthAccountApi.page" :columns="columns" :tool-button="false">
+		<ProTable ref="tableRef" :request-api="getTableList" :columns="columns" :tool-button="false">
 			<template #gender="{ row }">
 				{{ row.gender === 0 ? '男' : row.gender === 1 ? '女' : '未知' }}
 			</template>
@@ -31,8 +31,8 @@ import { auth } from '@/utils/authFunction';
 
 import ProTable from '@/components/ProTable/index.vue';
 import { ColumnProps } from '@/components/ProTable/interface';
-import { OAuthsServiceProxy } from '@/shared/service-proxies';
-const _oauthsService = new OAuthsServiceProxy(inject('$baseurl'), inject('$api'));
+import { AuthAccountPageQueryInput, AuthAccountsServiceProxy } from '@/shared/service-proxies';
+const _authsService = new AuthAccountsServiceProxy(inject('$baseurl'), inject('$api'));
 const loading = ref(false);
 //  table实例
 const tableRef = ref<InstanceType<typeof ProTable>>();
@@ -73,19 +73,25 @@ const columns = reactive<ColumnProps[]>([
 	},
 ]);
 
-const onChange = async (id: number) => {
+const onChange = async (id: string) => {
 	loading.value = true;
-	const { succeeded } = await _oauthsService.setBlogger(id);
+	const { success } = await _authsService.setBlogger(id);
 	loading.value = false;
-	if (succeeded) {
+	if (success) {
 		tableRef.value?.reset();
 	}
 };
 
+const getTableList = (params: any) => {
+	console.log(params);
+	let newParams = JSON.parse(JSON.stringify(params)) as AuthAccountPageQueryInput;
+	return _authsService.getList(newParams);
+};
+
 // 删除角色
-const onDeleteRole = async (id: number) => {
-	const { succeeded } = await AuthAccountApi.delete(id);
-	if (succeeded) {
+const onDeleteRole = async (id: string) => {
+	const { success } = await _authsService.delete(id);
+	if (success) {
 		ElMessage.success('删除成功');
 		tableRef.value?.reset();
 	}

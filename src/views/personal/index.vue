@@ -40,7 +40,7 @@
 									<el-row>
 										<el-col :xs="24" :sm="8" class="personal-item mb6">
 											<div class="personal-item-label">昵称：</div>
-											<div class="personal-item-value">{{ model.info.nickName }}</div>
+											<div class="personal-item-value">{{ model.info.name }}</div>
 										</el-col>
 										<el-col :xs="24" :sm="16" class="personal-item mb6">
 											<div class="personal-item-label">部门：</div>
@@ -133,12 +133,12 @@
 						<el-row :gutter="35">
 							<el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb20">
 								<el-form-item label="姓名" prop="name">
-									<el-input v-model="state.user.name" placeholder="请输入姓名" maxlength="16" clearable></el-input>
+									<el-input v-model="state.user.userName" placeholder="请输入姓名" maxlength="16" clearable></el-input>
 								</el-form-item>
 							</el-col>
 							<el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb20">
 								<el-form-item label="昵称" prop="nickName">
-									<el-input v-model="state.user.nickName" placeholder="请输入昵称" maxlength="32" clearable></el-input>
+									<el-input v-model="state.user.name" placeholder="请输入昵称" maxlength="32" clearable></el-input>
 								</el-form-item>
 							</el-col>
 							<el-col :xs="24" :sm="12" :md="8" :lg="6" :xl="4" class="mb20">
@@ -239,14 +239,16 @@ import { formatAxis } from '@/utils/formatTime';
 import { useUserInfo } from '@/stores/userInfo';
 import { type FormRules, type FormInstance, ElMessage } from 'element-plus';
 import { ChangePasswordOutput, UpdateUserInput, UserInfoOutput, UserSyssServiceProxy } from '@/shared/service-proxies';
+import moment from 'moment';
+
 const _userSysService = new UserSyssServiceProxy(inject('$baseurl'), inject('$api'));
 const pwdRules = reactive<FormRules>({
 	originalPwd: [{ required: true, message: '请输入原密码' }],
 	password: [{ required: true, message: '请输入新密码' }],
 });
 const userInfoRules = reactive<FormRules>({
-	name: [{ required: true, message: '请输入姓名' }],
-	nickName: [{ required: true, message: '请输入昵称' }],
+	userName: [{ required: true, message: '请输入姓名' }],
+	name: [{ required: true, message: '请输入昵称' }],
 	email: [{ required: true, message: '请输入邮箱' }],
 	birthday: [{ required: true, message: '请选择出生日期' }],
 	gender: [{ required: true, message: '请选择性别' }],
@@ -299,11 +301,13 @@ const onSuccess = async (response: any) => {
 onMounted(async () => {
 	const { result } = await _userSysService.currentUserInfo();
 	model.info = result!;
-	state.user.birthday = result?.birthday;
+	state.user.birthday = moment(result?.birthday).format('YYYY-MM-DD') as any;
 	state.user.name = result!.name!;
 	state.user.email = result?.email;
 	state.user.mobile = result?.mobile;
 	state.user.gender = result?.gender;
+	state.user.id = result?.id;
+	state.user.userName = result?.userName;
 	state.user.nickName = result?.nickName;
 });
 
