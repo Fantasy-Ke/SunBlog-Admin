@@ -201,7 +201,7 @@ const onCancel = () => {
 const onSubmit = () => {
 	userDialogFormRef.value?.validate(async (v) => {
 		if (!v) return;
-		const { success } = state.ruleForm.id ? await _userSysService.addUser(state.ruleForm) : await _userSysService.updateUser(state.ruleForm);
+		const { success } = state.ruleForm.id ? await _userSysService.updateUser(state.ruleForm) : await _userSysService.addUser(state.ruleForm);
 		if (success) {
 			closeDialog();
 			emit('refresh');

@@ -2,7 +2,14 @@
 	<div class="system-user-container layout-padding main-box">
 		<TreeFilter ref="orgTreeRef" :request-api="getTreeTableList" id="value" :default-value="initParam.orgId" @change="onChangeTree" />
 		<div class="table-box">
-			<ProTable ref="proTableRef" :init-param="initParam" :columns="columns" :request-api="getTableList" :tool-button="true">
+			<ProTable
+				ref="proTableRef"
+				:init-param="initParam"
+				:columns="columns"
+				:request-api="getTableList"
+				:data-callback="dataCallBack"
+				:tool-button="true"
+			>
 				<template #tools>
 					<!-- v-auth="'sysuser:add'" -->
 					<el-button type="primary" icon="ele-Plus" @click="onOpenUser('')">新增</el-button>
@@ -57,6 +64,7 @@ import ProTable from '@/components/ProTable/index.vue';
 import TreeFilter from '@/components/TreeFilter/index.vue';
 import type { ColumnProps } from '@/components/ProTable/interface';
 import { OrganizationSyssServiceProxy, QueryUserInput, TreeSelectOutput, UserSyssServiceProxy } from '@/shared/service-proxies';
+import moment from 'moment';
 const _userSysService = new UserSyssServiceProxy(inject('$baseurl'), inject('$api'));
 const _orgSysService = new OrganizationSyssServiceProxy(inject('$baseurl'), inject('$api'));
 // 引入组件
@@ -106,6 +114,9 @@ const columns: ColumnProps[] = [
 		prop: 'birthday',
 		label: '出生日期',
 		align: 'center',
+		formatter: (row: any) => {
+			return row.birthday ? moment(row.birthday).format('YYYY-MM-DD') : '';
+		},
 	},
 	{
 		prop: 'mobile',
@@ -132,6 +143,18 @@ const columns: ColumnProps[] = [
 		// isShow: auths(['sysuser:edit', 'sysuser:delete']),
 	},
 ];
+
+const dataCallBack = (data) => {
+	console.log(data);
+	data.rows.forEach((res) => {
+		if (res.birthday) {
+			res.birthday = moment(res.birthday).format('YYYY-MM-DD');
+		}
+	});
+	console.log(data);
+
+	return data;
+};
 
 const getTableList = (params: any) => {
 	let newParams = JSON.parse(JSON.stringify(params)) as QueryUserInput;
