@@ -1,12 +1,12 @@
 <template>
 	<div class="blog-article-container layout-padding main-box">
-		<TreeFilter ref="categoryTreeRef" :request-api="CategoryApi.treeSelect" id="value" :default-value="initParam.categoryId" @change="onChangeTree" />
+		<TreeFilter ref="categoryTreeRef" :request-api="getTreeTableList" id="value" :default-value="initParam.categoryId" @change="onChangeTree" />
 		<div class="table-box">
-			<ProTable ref="tableRef" :request-api="ArticleApi.page" :columns="columns" :init-param="initParam" :tool-button="false">
+			<ProTable ref="tableRef" :request-api="getTableList" :columns="columns" :init-param="initParam" :tool-button="false">
+				<!-- v-auth="'article:add'" -->
 				<template #tools>
 					<el-button
 						type="primary"
-						v-auth="'article:add'"
 						icon="ele-Plus"
 						@click="
 							() => {
@@ -26,12 +26,12 @@
 				<template #creationType="{ row }">
 					<el-tag :type="row.creationType === 0 ? 'success' : 'danger'"> {{ row.creationType === 0 ? '原创' : '转载' }}</el-tag>
 				</template>
+				<!-- v-auth="'article:edit'" -->
 				<template #action="{ row }">
 					<el-button
 						icon="ele-Edit"
 						size="small"
 						text
-						v-auth="'article:edit'"
 						type="primary"
 						@click="
 							() => {
@@ -43,7 +43,8 @@
 					</el-button>
 					<el-popconfirm title="确认删除吗？" @confirm="onDelete(row.id)">
 						<template #reference>
-							<el-button icon="ele-Delete" size="small" text v-auth="'sysrole:delete'" type="danger"> 删除 </el-button>
+							<!-- v-auth="'sysrole:delete'" -->
+							<el-button icon="ele-Delete" size="small" text type="danger"> 删除 </el-button>
 						</template>
 					</el-popconfirm>
 				</template>
@@ -53,20 +54,21 @@
 </template>
 
 <script setup lang="ts" name="blogArticle">
-import { ref, reactive } from 'vue';
+import { ref, reactive, inject } from 'vue';
 import ProTable from '@/components/ProTable/index.vue';
 import TreeFilter from '@/components/TreeFilter/index.vue';
-import ArticleApi from '@/api/ArticleApi';
-import CategoryApi from '@/api/CategoryApi';
 import type { ColumnProps } from '@/components/ProTable/interface';
-import { auths } from '@/utils/authFunction';
+// import { auths } from '@/utils/authFunction';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
+import { ArticlePageQueryInput, ArticleSsServiceProxy, CategorySsServiceProxy, KeyDto } from '@/shared/service-proxies';
 
 const router = useRouter();
 // 表格实例
 const tableRef = ref<InstanceType<typeof ProTable>>();
 const categoryTreeRef = ref<InstanceType<typeof TreeFilter>>();
+const _articleService = new ArticleSsServiceProxy(inject('$baseurl'), inject('$api'));
+const _categoryService = new CategorySsServiceProxy(inject('$baseurl'), inject('$api'));
 
 const initParam = reactive<{ categoryId?: number | string }>({ categoryId: '' });
 const columns = reactive<ColumnProps[]>([
@@ -93,18 +95,27 @@ const columns = reactive<ColumnProps[]>([
 		align: 'center',
 		fixed: 'right',
 		width: 150,
-		isShow: auths(['article:edit', 'article:delete']),
+		// isShow: auths(['article:edit', 'article:delete']),
 	},
 ]);
+
+const getTableList = (params: any) => {
+	let newParams = JSON.parse(JSON.stringify(params)) as ArticlePageQueryInput;
+	return _articleService.getPage(newParams);
+};
+
+const getTreeTableList = () => {
+	return _categoryService.treeSelect();
+};
 
 const onChangeTree = (val?: number | string) => {
 	initParam.categoryId = val;
 };
 
 // 删除
-const onDelete = async (id: number) => {
-	const { succeeded } = await ArticleApi.delete({ id });
-	if (succeeded) {
+const onDelete = async (id: string) => {
+	const { success } = await _articleService.delete({ id: id } as KeyDto);
+	if (success) {
 		tableRef.value?.reset();
 		ElMessage.success('删除成功');
 	}

@@ -208,7 +208,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, onMounted, shallowRef, ref, onBeforeUnmount } from 'vue';
+import { reactive, onMounted, shallowRef, ref, onBeforeUnmount, inject } from 'vue';
 import { mavonEditor } from 'mavon-editor';
 import UploadImg from '@/components/Upload/Img.vue';
 import 'mavon-editor/dist/css/index.css';
@@ -216,17 +216,25 @@ import '@wangeditor/editor/dist/css/style.css';
 import html2markdown from '@notable/html2markdown';
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue';
 import type { IDomEditor, IEditorConfig, IToolbarConfig } from '@wangeditor/editor';
-import type { SelectOutput, TreeSelectOutput, UpdateArticleInput } from '@/api/models';
-import CategoryApi from '@/api/CategoryApi';
-import TagsApi from '@/api/TagsApi';
 import http from '@/utils/http';
 import { type FormRules, type FormInstance, ElMessage } from 'element-plus';
-import ArticleApi from '@/api/ArticleApi';
 import { useRoute } from 'vue-router';
 type ImageUploadType = (url: string, alt: string, href: string) => void;
 type VideoUploadType = (url: string, poster: string) => void;
 import miitBus from '@/utils/mitt';
+import {
+	ArticleSsServiceProxy,
+	CategorySsServiceProxy,
+	CreateOrUpdateArticleInput,
+	SelectOutput,
+	TagssServiceProxy,
+	TreeSelectOutput,
+} from '@/shared/service-proxies';
+
 const route = useRoute();
+const _articleService = new ArticleSsServiceProxy(inject('$baseurl'), inject('$api'));
+const _categoryService = new CategorySsServiceProxy(inject('$baseurl'), inject('$api'));
+const _tagsService = new TagssServiceProxy(inject('$baseurl'), inject('$api'));
 // wangEditor富文本编辑器实例
 const editorRef = shallowRef<IDomEditor>();
 // markdown编辑器实例
@@ -313,8 +321,8 @@ const state = reactive({
 		isTop: false,
 		isHtml: false,
 		content: ``,
-		id: 0,
-	} as UpdateArticleInput,
+		id: '',
+	} as CreateOrUpdateArticleInput,
 	categoryData: [] as TreeSelectOutput[],
 	tagsData: [] as SelectOutput[],
 	editorConfig: {
@@ -414,8 +422,8 @@ const onUploadMdImg = async (pos: any, file: any) => {
 const onSave = async () => {
 	await formRef.value?.validate(async (v) => {
 		if (v) {
-			const { succeeded } = state.form.id === 0 ? await ArticleApi.add(state.form) : await ArticleApi.edit(state.form);
-			if (succeeded) {
+			const { success } = state.form.id ? await _articleService.createOrUpdate(state.form) : await _articleService.createOrUpdate(state.form);
+			if (success) {
 				ElMessage.success('保存成功');
 				miitBus.emit('onCurrentContextmenuClick', Object.assign({}, { contextMenuClickId: 1, ...route }));
 			}
@@ -430,16 +438,16 @@ const onCancel = () => {
 
 onMounted(async () => {
 	// 获取栏目和标签
-	const [c, t] = await Promise.all([CategoryApi.treeSelect(), TagsApi.select()]);
+	const [c, t] = await Promise.all([_categoryService.treeSelect(), _tagsService.select()]);
 	state.form.id = (route.query.id as never) ?? 0;
-	if (state.form.id > 0) {
-		const { data, succeeded } = await ArticleApi.detail(state.form.id);
-		if (succeeded && data) {
-			state.form = data as UpdateArticleInput;
+	if (state.form.id) {
+		const { result, success } = await _articleService.getDetail(state.form.id);
+		if (success && result) {
+			state.form = result as CreateOrUpdateArticleInput;
 		}
 	}
-	state.categoryData = c.data ?? [];
-	state.tagsData = t.data ?? [];
+	state.categoryData = c.result ?? [];
+	state.tagsData = t.result ?? [];
 });
 
 // 组件销毁时，也及时销毁编辑器
