@@ -2662,6 +2662,185 @@ export class OrganizationSyssServiceProxy {
     }
 }
 
+export class PictureSsServiceProxy {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * 上传图片到相册
+     * @param body (optional) 
+     * @return Success
+     */
+    addPictures(body: AddPictureInput | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
+        let url_ = this.baseUrl + "/api/PictureSs/AddPictures";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processAddPictures(_response);
+        });
+    }
+
+    protected processAddPictures(response: AxiosResponse): Promise<ZEngineResponse<void>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<ZEngineResponse<void>>(_responseText);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<void>>(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    delete(id: string | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
+        let url_ = this.baseUrl + "/api/PictureSs/Delete?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "DELETE",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDelete(_response);
+        });
+    }
+
+    protected processDelete(response: AxiosResponse): Promise<ZEngineResponse<void>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<ZEngineResponse<void>>(_responseText);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<void>>(null as any);
+    }
+
+    /**
+     * 删除上册图片
+     * @param body (optional) 
+     * @return Success
+     */
+    getPage(body: PicturesPageQueryInput | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<PicturesPageOutputPageResult>> {
+        let url_ = this.baseUrl + "/api/PictureSs/GetPage";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "DELETE",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetPage(_response);
+        });
+    }
+
+    protected processGetPage(response: AxiosResponse): Promise<ZEngineResponse<PicturesPageOutputPageResult>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let result200Data: any = null;
+            let resultData200  = _responseText.result;
+            result200 = PicturesPageOutputPageResult.fromJS(resultData200);
+            result200Data = ZEngineResponse.fromJS(_responseText);
+            result200Data.result = result200;
+            return Promise.resolve<ZEngineResponse<PicturesPageOutputPageResult>>(result200Data);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<PicturesPageOutputPageResult>>(null as any);
+    }
+}
+
 export class AuthAccountsServiceProxy {
     protected instance: AxiosInstance;
     protected baseUrl: string;
@@ -4471,6 +4650,308 @@ export class CommentsCsServiceProxy {
     }
 }
 
+export class CategorySsServiceProxy {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * 添加文章栏目
+     * @param body (optional) 
+     * @return Success
+     */
+    addCategory(body: AddCategoryInput | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
+        let url_ = this.baseUrl + "/api/CategorySs/AddCategory";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processAddCategory(_response);
+        });
+    }
+
+    protected processAddCategory(response: AxiosResponse): Promise<ZEngineResponse<void>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<ZEngineResponse<void>>(_responseText);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<void>>(null as any);
+    }
+
+    /**
+     * 删除
+     * @param body (optional) 
+     * @return Success
+     */
+    delete(body: KeyDto | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
+        let url_ = this.baseUrl + "/api/CategorySs/Delete";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDelete(_response);
+        });
+    }
+
+    protected processDelete(response: AxiosResponse): Promise<ZEngineResponse<void>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<ZEngineResponse<void>>(_responseText);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<void>>(null as any);
+    }
+
+    /**
+     * 文章栏目列表
+     * @param name (optional) 
+     * @return Success
+     */
+    getPage(name: string | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<CategoryPageOutput[]>> {
+        let url_ = this.baseUrl + "/api/CategorySs/GetPage?";
+        if (name === null)
+            throw new Error("The parameter 'name' cannot be null.");
+        else if (name !== undefined)
+            url_ += "name=" + encodeURIComponent("" + name) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetPage(_response);
+        });
+    }
+
+    protected processGetPage(response: AxiosResponse): Promise<ZEngineResponse<CategoryPageOutput[]>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let result200Data: any = null;
+            let resultData200  = _responseText.result;
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(CategoryPageOutput.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            result200Data = ZEngineResponse.fromJS(_responseText);
+            result200Data.result = result200;
+            return Promise.resolve<ZEngineResponse<CategoryPageOutput[]>>(result200Data);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<CategoryPageOutput[]>>(null as any);
+    }
+
+    /**
+     * 获取文章栏目下拉选项
+     * @return Success
+     */
+    treeSelect( cancelToken?: CancelToken): Promise<ZEngineResponse<TreeSelectOutput[]>> {
+        let url_ = this.baseUrl + "/api/CategorySs/TreeSelect";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processTreeSelect(_response);
+        });
+    }
+
+    protected processTreeSelect(response: AxiosResponse): Promise<ZEngineResponse<TreeSelectOutput[]>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let result200Data: any = null;
+            let resultData200  = _responseText.result;
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(TreeSelectOutput.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            result200Data = ZEngineResponse.fromJS(_responseText);
+            result200Data.result = result200;
+            return Promise.resolve<ZEngineResponse<TreeSelectOutput[]>>(result200Data);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<TreeSelectOutput[]>>(null as any);
+    }
+
+    /**
+     * 更新文章栏目
+     * @param body (optional) 
+     * @return Success
+     */
+    updateCategory(body: UpdateCategoryInput | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
+        let url_ = this.baseUrl + "/api/CategorySs/UpdateCategory";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpdateCategory(_response);
+        });
+    }
+
+    protected processUpdateCategory(response: AxiosResponse): Promise<ZEngineResponse<void>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<ZEngineResponse<void>>(_responseText);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<void>>(null as any);
+    }
+}
+
 export class ArticleSsServiceProxy {
     protected instance: AxiosInstance;
     protected baseUrl: string;
@@ -5530,6 +6011,79 @@ export class AlbumsCsServiceProxy {
     }
 }
 
+export class AddCategoryInput implements IAddCategoryInput {
+    /** 栏目名称 */
+    name: string | undefined;
+    /** 父级id */
+    parentId: number | undefined;
+    /** 封面图 */
+    cover: string | undefined;
+    status: AvailabilityStatus;
+    /** 排序值（值越小越靠前） */
+    sort: number;
+    /** 备注 */
+    remark: string | undefined;
+
+    constructor(data?: IAddCategoryInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.parentId = _data["parentId"];
+            this.cover = _data["cover"];
+            this.status = _data["status"];
+            this.sort = _data["sort"];
+            this.remark = _data["remark"];
+        }
+    }
+
+    static fromJS(data: any): AddCategoryInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new AddCategoryInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["parentId"] = this.parentId;
+        data["cover"] = this.cover;
+        data["status"] = this.status;
+        data["sort"] = this.sort;
+        data["remark"] = this.remark;
+        return data;
+    }
+
+    clone(): AddCategoryInput {
+        const json = this.toJSON();
+        let result = new AddCategoryInput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IAddCategoryInput {
+    /** 栏目名称 */
+    name: string | undefined;
+    /** 父级id */
+    parentId: number | undefined;
+    /** 封面图 */
+    cover: string | undefined;
+    status: AvailabilityStatus;
+    /** 排序值（值越小越靠前） */
+    sort: number;
+    /** 备注 */
+    remark: string | undefined;
+}
+
 export class AddCommentInput implements IAddCommentInput {
     /** 对应模块ID（null表留言，0代表友链的评论） */
     moduleId: string | undefined;
@@ -5790,6 +6344,57 @@ export interface IAddOrgInput {
     sort: number;
     /** 备注 */
     remark: string | undefined;
+}
+
+export class AddPictureInput implements IAddPictureInput {
+    /** 相册Id */
+    albumId: string;
+    /** 图片地址 */
+    url: string;
+
+    constructor(data?: IAddPictureInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.albumId = _data["albumId"];
+            this.url = _data["url"];
+        }
+    }
+
+    static fromJS(data: any): AddPictureInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new AddPictureInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["albumId"] = this.albumId;
+        data["url"] = this.url;
+        return data;
+    }
+
+    clone(): AddPictureInput {
+        const json = this.toJSON();
+        let result = new AddPictureInput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IAddPictureInput {
+    /** 相册Id */
+    albumId: string;
+    /** 图片地址 */
+    url: string;
 }
 
 export class AddRoleInput implements IAddRoleInput {
@@ -7954,6 +8559,105 @@ export interface ICategoryOutput {
     total: number;
 }
 
+export class CategoryPageOutput implements ICategoryPageOutput {
+    /** 栏目ID */
+    id: string;
+    /** 栏目名称 */
+    name: string | undefined;
+    /** 父级id */
+    parentId: string | undefined;
+    /** 封面图 */
+    cover: string | undefined;
+    status: AvailabilityStatus;
+    /** 排序值（值越小越靠前） */
+    sort: number;
+    /** 备注 */
+    remark: string | undefined;
+    /** 创建时间 */
+    createdTime: moment.Moment;
+    /** 子栏目 */
+    children: CategoryPageOutput[] | undefined;
+
+    constructor(data?: ICategoryPageOutput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.parentId = _data["parentId"];
+            this.cover = _data["cover"];
+            this.status = _data["status"];
+            this.sort = _data["sort"];
+            this.remark = _data["remark"];
+            this.createdTime = _data["createdTime"] ? moment(_data["createdTime"].toString()) : <any>undefined;
+            if (Array.isArray(_data["children"])) {
+                this.children = [] as any;
+                for (let item of _data["children"])
+                    this.children.push(CategoryPageOutput.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): CategoryPageOutput {
+        data = typeof data === 'object' ? data : {};
+        let result = new CategoryPageOutput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["parentId"] = this.parentId;
+        data["cover"] = this.cover;
+        data["status"] = this.status;
+        data["sort"] = this.sort;
+        data["remark"] = this.remark;
+        data["createdTime"] = this.createdTime ? this.createdTime.toISOString() : <any>undefined;
+        if (Array.isArray(this.children)) {
+            data["children"] = [];
+            for (let item of this.children)
+                data["children"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): CategoryPageOutput {
+        const json = this.toJSON();
+        let result = new CategoryPageOutput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICategoryPageOutput {
+    /** 栏目ID */
+    id: string;
+    /** 栏目名称 */
+    name: string | undefined;
+    /** 父级id */
+    parentId: string | undefined;
+    /** 封面图 */
+    cover: string | undefined;
+    status: AvailabilityStatus;
+    /** 排序值（值越小越靠前） */
+    sort: number;
+    /** 备注 */
+    remark: string | undefined;
+    /** 创建时间 */
+    createdTime: moment.Moment;
+    /** 子栏目 */
+    children: CategoryPageOutput[] | undefined;
+}
+
 export class ChangePasswordOutput implements IChangePasswordOutput {
     /** 原密码 */
     originalPwd: string;
@@ -8838,79 +9542,6 @@ export interface ICustomConfigItemQueryInput {
     pageSize: number;
     /** 配置ID */
     id: string;
-}
-
-export class DateOnly implements IDateOnly {
-    year: number;
-    month: number;
-    day: number;
-    dayOfWeek: DayOfWeek;
-    readonly dayOfYear: number;
-    readonly dayNumber: number;
-
-    constructor(data?: IDateOnly) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.year = _data["year"];
-            this.month = _data["month"];
-            this.day = _data["day"];
-            this.dayOfWeek = _data["dayOfWeek"];
-            (<any>this).dayOfYear = _data["dayOfYear"];
-            (<any>this).dayNumber = _data["dayNumber"];
-        }
-    }
-
-    static fromJS(data: any): DateOnly {
-        data = typeof data === 'object' ? data : {};
-        let result = new DateOnly();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["year"] = this.year;
-        data["month"] = this.month;
-        data["day"] = this.day;
-        data["dayOfWeek"] = this.dayOfWeek;
-        data["dayOfYear"] = this.dayOfYear;
-        data["dayNumber"] = this.dayNumber;
-        return data;
-    }
-
-    clone(): DateOnly {
-        const json = this.toJSON();
-        let result = new DateOnly();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IDateOnly {
-    year: number;
-    month: number;
-    day: number;
-    dayOfWeek: DayOfWeek;
-    dayOfYear: number;
-    dayNumber: number;
-}
-
-export enum DayOfWeek {
-    _0 = 0,
-    _1 = 1,
-    _2 = 2,
-    _3 = 3,
-    _4 = 4,
-    _5 = 5,
-    _6 = 6,
 }
 
 export class FriendLinkOutput implements IFriendLinkOutput {
@@ -9970,6 +10601,173 @@ export interface IPictureOutputPageResult {
     pages: number;
     total: number;
     rows: PictureOutput[] | undefined;
+}
+
+export class PicturesPageOutput implements IPicturesPageOutput {
+    id: string;
+    url: string | undefined;
+
+    constructor(data?: IPicturesPageOutput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.url = _data["url"];
+        }
+    }
+
+    static fromJS(data: any): PicturesPageOutput {
+        data = typeof data === 'object' ? data : {};
+        let result = new PicturesPageOutput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["url"] = this.url;
+        return data;
+    }
+
+    clone(): PicturesPageOutput {
+        const json = this.toJSON();
+        let result = new PicturesPageOutput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IPicturesPageOutput {
+    id: string;
+    url: string | undefined;
+}
+
+export class PicturesPageOutputPageResult implements IPicturesPageOutputPageResult {
+    pageNo: number;
+    pageSize: number;
+    pages: number;
+    total: number;
+    rows: PicturesPageOutput[] | undefined;
+
+    constructor(data?: IPicturesPageOutputPageResult) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.pageNo = _data["pageNo"];
+            this.pageSize = _data["pageSize"];
+            this.pages = _data["pages"];
+            this.total = _data["total"];
+            if (Array.isArray(_data["rows"])) {
+                this.rows = [] as any;
+                for (let item of _data["rows"])
+                    this.rows.push(PicturesPageOutput.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): PicturesPageOutputPageResult {
+        data = typeof data === 'object' ? data : {};
+        let result = new PicturesPageOutputPageResult();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["pageNo"] = this.pageNo;
+        data["pageSize"] = this.pageSize;
+        data["pages"] = this.pages;
+        data["total"] = this.total;
+        if (Array.isArray(this.rows)) {
+            data["rows"] = [];
+            for (let item of this.rows)
+                data["rows"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): PicturesPageOutputPageResult {
+        const json = this.toJSON();
+        let result = new PicturesPageOutputPageResult();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IPicturesPageOutputPageResult {
+    pageNo: number;
+    pageSize: number;
+    pages: number;
+    total: number;
+    rows: PicturesPageOutput[] | undefined;
+}
+
+export class PicturesPageQueryInput implements IPicturesPageQueryInput {
+    pageNo: number;
+    pageSize: number;
+    /** 相册ID */
+    id: string;
+
+    constructor(data?: IPicturesPageQueryInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.pageNo = _data["pageNo"];
+            this.pageSize = _data["pageSize"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): PicturesPageQueryInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new PicturesPageQueryInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["pageNo"] = this.pageNo;
+        data["pageSize"] = this.pageSize;
+        data["id"] = this.id;
+        return data;
+    }
+
+    clone(): PicturesPageQueryInput {
+        const json = this.toJSON();
+        let result = new PicturesPageQueryInput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IPicturesPageQueryInput {
+    pageNo: number;
+    pageSize: number;
+    /** 相册ID */
+    id: string;
 }
 
 export class QueryUserInput implements IQueryUserInput {
@@ -11560,6 +12358,85 @@ export interface ITreeSelectOutput {
     children: TreeSelectOutput[] | undefined;
 }
 
+export class UpdateCategoryInput implements IUpdateCategoryInput {
+    /** 栏目名称 */
+    name: string | undefined;
+    /** 父级id */
+    parentId: number | undefined;
+    /** 封面图 */
+    cover: string | undefined;
+    status: AvailabilityStatus;
+    /** 排序值（值越小越靠前） */
+    sort: number;
+    /** 备注 */
+    remark: string | undefined;
+    /** 栏目ID */
+    id: string;
+
+    constructor(data?: IUpdateCategoryInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.parentId = _data["parentId"];
+            this.cover = _data["cover"];
+            this.status = _data["status"];
+            this.sort = _data["sort"];
+            this.remark = _data["remark"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): UpdateCategoryInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateCategoryInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["parentId"] = this.parentId;
+        data["cover"] = this.cover;
+        data["status"] = this.status;
+        data["sort"] = this.sort;
+        data["remark"] = this.remark;
+        data["id"] = this.id;
+        return data;
+    }
+
+    clone(): UpdateCategoryInput {
+        const json = this.toJSON();
+        let result = new UpdateCategoryInput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IUpdateCategoryInput {
+    /** 栏目名称 */
+    name: string | undefined;
+    /** 父级id */
+    parentId: number | undefined;
+    /** 封面图 */
+    cover: string | undefined;
+    status: AvailabilityStatus;
+    /** 排序值（值越小越靠前） */
+    sort: number;
+    /** 备注 */
+    remark: string | undefined;
+    /** 栏目ID */
+    id: string;
+}
+
 export class UpdateCurrentUserInput implements IUpdateCurrentUserInput {
     /** 姓名 */
     name: string;
@@ -12599,9 +13476,11 @@ export class ZUserInfoOutput implements IZUserInfoOutput {
     userName: string | undefined;
     /** 头像 */
     avatar: string | undefined;
-    birthday: DateOnly;
+    /** 生日 */
+    birthday: moment.Moment | undefined;
     /** 邮箱 */
     email: string | undefined;
+    gender: Gender;
     /** 昵称 */
     nickName: string | undefined;
     /** 备注 */
@@ -12613,7 +13492,7 @@ export class ZUserInfoOutput implements IZUserInfoOutput {
     /** 手机号码 */
     mobile: string | undefined;
     /** 机构id */
-    orgId: number;
+    orgId: string | undefined;
     /** 机构名称 */
     orgName: string | undefined;
     /** 授权按钮 */
@@ -12633,8 +13512,9 @@ export class ZUserInfoOutput implements IZUserInfoOutput {
             this.name = _data["name"];
             this.userName = _data["userName"];
             this.avatar = _data["avatar"];
-            this.birthday = _data["birthday"] ? DateOnly.fromJS(_data["birthday"]) : <any>undefined;
+            this.birthday = _data["birthday"] ? moment(_data["birthday"].toString()) : <any>undefined;
             this.email = _data["email"];
+            this.gender = _data["gender"];
             this.nickName = _data["nickName"];
             this.remark = _data["remark"];
             this.lastLoginIp = _data["lastLoginIp"];
@@ -12662,8 +13542,9 @@ export class ZUserInfoOutput implements IZUserInfoOutput {
         data["name"] = this.name;
         data["userName"] = this.userName;
         data["avatar"] = this.avatar;
-        data["birthday"] = this.birthday ? this.birthday.toJSON() : <any>undefined;
+        data["birthday"] = this.birthday ? this.birthday.toISOString() : <any>undefined;
         data["email"] = this.email;
+        data["gender"] = this.gender;
         data["nickName"] = this.nickName;
         data["remark"] = this.remark;
         data["lastLoginIp"] = this.lastLoginIp;
@@ -12694,9 +13575,11 @@ export interface IZUserInfoOutput {
     userName: string | undefined;
     /** 头像 */
     avatar: string | undefined;
-    birthday: DateOnly;
+    /** 生日 */
+    birthday: moment.Moment | undefined;
     /** 邮箱 */
     email: string | undefined;
+    gender: Gender;
     /** 昵称 */
     nickName: string | undefined;
     /** 备注 */
@@ -12708,7 +13591,7 @@ export interface IZUserInfoOutput {
     /** 手机号码 */
     mobile: string | undefined;
     /** 机构id */
-    orgId: number;
+    orgId: string | undefined;
     /** 机构名称 */
     orgName: string | undefined;
     /** 授权按钮 */
