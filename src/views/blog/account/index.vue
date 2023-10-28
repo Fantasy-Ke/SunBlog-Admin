@@ -5,17 +5,19 @@
 				{{ row.gender === 0 ? '男' : row.gender === 1 ? '女' : '未知' }}
 			</template>
 			<template #isBlogger="{ row }">
-				<template v-if="auth('authaccount:setblogger')">
+				<!-- v-if="auth('authaccount:setblogger')" -->
+				<template>
 					<el-switch v-model="row.isBlogger" inline-prompt active-text="是" inactive-text="否" @change="onChange(row.id)" />
 				</template>
-				<template v-else>
+				<!-- <template v-else>
 					<el-tag :type="row.isBlogger ? 'success' : 'danger'">{{ row.isBlogger ? '是' : '否' }}</el-tag>
-				</template>
+				</template> -->
 			</template>
 			<template #action="scope">
 				<el-popconfirm title="确认删除吗？" @confirm="onDeleteRole(scope.row.id)">
 					<template #reference>
-						<el-button icon="ele-Delete" size="small" v-auth="'authaccount:delete'" text type="danger"> 删除 </el-button>
+						<!-- v-auth="'authaccount:delete'" -->
+						<el-button icon="ele-Delete" size="small" text type="danger"> 删除 </el-button>
 					</template>
 				</el-popconfirm>
 			</template>
@@ -26,9 +28,7 @@
 <script setup lang="ts" name="friendLink">
 import { inject, reactive, ref } from 'vue';
 import { ElMessage } from 'element-plus';
-import AuthAccountApi from '@/api/AuthAccountApi';
 import { auth } from '@/utils/authFunction';
-
 import ProTable from '@/components/ProTable/index.vue';
 import { ColumnProps } from '@/components/ProTable/interface';
 import { AuthAccountPageQueryInput, AuthAccountsServiceProxy } from '@/shared/service-proxies';
