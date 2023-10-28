@@ -1,7 +1,8 @@
 <template>
 	<div class="blog-album-container layout-padding">
 		<ProTable ref="tableRef" :request-api="getTableList" :columns="columns" :tool-button="false">
-			<template #tools> <el-button type="primary" v-auth="'albums:add'" icon="ele-Plus" @click="onOpen(null)"> 新增 </el-button></template>
+			<!-- v-auth="'albums:add'" -->
+			<template #tools> <el-button type="primary" icon="ele-Plus" @click="onOpen(null)"> 新增 </el-button></template>
 			<template #status="scope">
 				<el-tag :type="scope.row.status === 0 ? 'success' : 'danger'"> {{ scope.row.status === 0 ? '启用' : '禁用' }}</el-tag>
 			</template>
@@ -12,13 +13,15 @@
 				<el-tag :type="row.isVisible ? 'success' : 'danger'"> {{ row.isVisible ? '显示' : '隐藏' }}</el-tag>
 			</template>
 			<template #action="{ row }">
-				<el-button icon="ele-Edit" size="small" v-auth="'albums:edit'" text type="primary" @click="onOpen(row)"> 编辑 </el-button>
-				<el-dropdown v-auths="['pictures:page', 'albums:delete']">
+				<!-- v-auth="'albums:edit'" -->
+				<el-button icon="ele-Edit" size="small" text type="primary" @click="onOpen(row)"> 编辑 </el-button>
+				<!-- v-auths="['pictures:page', 'albums:delete']" -->
+				<el-dropdown>
 					<el-button icon="ele-MoreFilled" size="small" text type="primary" style="padding-left: 12px" />
 					<template #dropdown>
 						<el-dropdown-menu>
+							<!-- v-if="auth('pictures:page')" -->
 							<el-dropdown-item
-								v-if="auth('pictures:page')"
 								icon="ele-PictureFilled"
 								@click="
 									() => {
@@ -33,9 +36,8 @@
 							>
 								图片列表
 							</el-dropdown-item>
-							<el-dropdown-item icon="ele-Delete" v-if="auth('albums:delete')" :divided="auth('pictures:page')" @click="onDeleteRole(row)">
-								删除相册
-							</el-dropdown-item>
+							<!-- v-if="auth('albums:delete')" :divided="auth('pictures:page')" -->
+							<el-dropdown-item icon="ele-Delete" @click="onDeleteRole(row)"> 删除相册 </el-dropdown-item>
 						</el-dropdown-menu>
 					</template>
 				</el-dropdown>
@@ -48,7 +50,7 @@
 <script setup lang="ts" name="blogAlbums">
 import { defineAsyncComponent, inject, reactive, ref } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { auth, auths } from '@/utils/authFunction';
+// import { auth, auths } from '@/utils/authFunction';
 
 // 引入组件
 const AlbumDialog = defineAsyncComponent(() => import('./dialog.vue'));
@@ -126,7 +128,7 @@ const columns = reactive<ColumnProps[]>([
 		label: '操作',
 		fixed: 'right',
 		width: 150,
-		isShow: auths(['albums:edit', 'albums:delete']),
+		// isShow: auths(['albums:edit', 'albums:delete']),
 	},
 ]);
 

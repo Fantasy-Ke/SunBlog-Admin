@@ -60,10 +60,10 @@
 </template>
 
 <script setup lang="ts" name="blogPictures">
-import { reactive, onMounted, ref, nextTick } from 'vue';
-import PicturesApi from '@/api/PicturesApi';
+import { reactive, onMounted, ref, nextTick, inject } from 'vue';
 import { useRoute } from 'vue-router';
-import type { PicturesPageOutput } from '@/api/models';
+import { AddPictureInput, PictureSsServiceProxy, PicturesPageOutput, PicturesPageQueryInput } from '@/shared/service-proxies';
+const _pictureService = new PictureSsServiceProxy(inject('$baseurl'), inject('$api'));
 // 查看图片
 const imgViewVisible = ref(false);
 const imageUrl = ref('');
@@ -77,8 +77,8 @@ const state = reactive({
 		param: {
 			pageNo: 1,
 			pageSize: 30,
-			id: 0,
-		},
+			id: '',
+		} as PicturesPageQueryInput,
 	},
 	loading: false,
 });
@@ -95,23 +95,23 @@ const onHandleCurrentChange = (val: number) => {
 const onUploadSuccess = async (res: any) => {
 	state.loading = true;
 	if (res && res.length > 0) {
-		PicturesApi.add({ albumId: state.tableData.param.id, url: res[0].url });
+		_pictureService.addPictures({ albumId: state.tableData.param.id, url: res[0].url } as AddPictureInput);
 		await loadData();
 	}
 	state.loading = false;
 };
-const onDeleteImg = async (id: number) => {
+const onDeleteImg = async (id: string) => {
 	state.loading = true;
-	const { succeeded } = await PicturesApi.delete(id);
-	if (succeeded) {
+	const { success } = await _pictureService.delete(id);
+	if (success) {
 		await loadData();
 	}
 	state.loading = false;
 };
 const loadData = async () => {
-	const { data } = await PicturesApi.page(state.tableData.param);
-	state.tableData.data = data?.rows ?? [];
-	state.tableData.total = data?.total ?? 0;
+	const { result } = await _pictureService.getPage(state.tableData.param);
+	state.tableData.data = result?.rows ?? [];
+	state.tableData.total = result?.total ?? 0;
 	nextTick(() => {});
 };
 // 页面加载时
