@@ -81,15 +81,15 @@
 <script setup lang="ts" name="tagDialog">
 import '@wangeditor/editor/dist/css/style.css';
 import type { FormInstance, FormRules } from 'element-plus';
-import { reactive, ref, nextTick, shallowRef, onBeforeUnmount } from 'vue';
+import { reactive, ref, nextTick, shallowRef, onBeforeUnmount, inject } from 'vue';
 import UploadImgs from '@/components/Upload/Imgs.vue';
-import type { UpdateTalksInput } from '@/api/models';
-import TalksApi from '@/api/TalksApi';
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue';
 import type { IDomEditor, IEditorConfig, IToolbarConfig } from '@wangeditor/editor';
 import http from '@/utils/http';
+import { CreateOrUpdateTalksInput, TalksSsServiceProxy } from '@/shared/service-proxies';
 type ImageUploadType = (url: string, alt: string, href: string) => void;
 type VideoUploadType = (url: string, poster: string) => void;
+const _talkService = new TalksSsServiceProxy(inject('$baseurl'), inject('$api'));
 // 定义子组件向父组件传值/事件
 const emit = defineEmits(['refresh']);
 
@@ -107,10 +107,10 @@ const rules = reactive<FormRules>({
 //表单状态
 const state = reactive({
 	ruleForm: {
-		id: 0,
+		id: '',
 		status: 0,
 		isAllowComments: true,
-	} as UpdateTalksInput,
+	} as CreateOrUpdateTalksInput,
 	images: [] as Array<any>,
 	dialog: {
 		isShowDialog: false,
@@ -156,12 +156,12 @@ const onCreated = (editor: any) => {
 };
 
 // 打开弹窗
-const openDialog = async (row: UpdateTalksInput | null) => {
+const openDialog = async (row: CreateOrUpdateTalksInput | null) => {
 	state.dialog.isShowDialog = true;
 	state.dialog.loading = true;
 	state.images = [];
 	if (row != null) {
-		state.ruleForm = { ...row };
+		state.ruleForm = { ...row } as CreateOrUpdateTalksInput;
 		if (row.images) {
 			state.images = row.images.split(',').map((item) => {
 				return { name: '', url: item };
@@ -170,7 +170,7 @@ const openDialog = async (row: UpdateTalksInput | null) => {
 		state.dialog.title = '修改动态';
 		state.dialog.submitTxt = '修 改';
 	} else {
-		state.ruleForm.id = 0;
+		state.ruleForm.id = '';
 		state.dialog.title = '新增动态';
 		state.dialog.submitTxt = '新 增';
 		// 重置表单
@@ -197,8 +197,8 @@ const onSubmit = async () => {
 			}
 			//仅保留img标签
 			state.ruleForm.content = state.ruleForm.content?.replaceAll(/<[^>]+>/g, '');
-			const { succeeded } = state.ruleForm.id === 0 ? await TalksApi.add(state.ruleForm) : await TalksApi.edit(state.ruleForm);
-			if (succeeded) {
+			const { success } = state.ruleForm.id ? await _talkService.createOrUpdate(state.ruleForm) : await _talkService.createOrUpdate(state.ruleForm);
+			if (success) {
 				closeDialog();
 				emit('refresh');
 			}

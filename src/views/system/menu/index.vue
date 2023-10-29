@@ -35,7 +35,6 @@
 <script setup lang="ts" name="sysMenu">
 import { defineAsyncComponent, ref, reactive, inject } from 'vue';
 import { ElMessage } from 'element-plus';
-import { auths } from '@/utils/authFunction';
 import ProTable from '@/components/ProTable/index.vue';
 import { ColumnProps } from '@/components/ProTable/interface';
 import { MenusServiceProxy } from '@/shared/service-proxies';
