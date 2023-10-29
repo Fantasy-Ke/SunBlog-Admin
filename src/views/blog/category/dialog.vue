@@ -64,11 +64,11 @@
 </template>
 
 <script setup lang="ts" name="systemDeptDialog">
-import { reactive, ref, nextTick } from 'vue';
-import type { UpdateCategoryInput, TreeSelectOutput } from '@/api/models';
-import CategoryApi from '@/api/CategoryApi';
+import { reactive, ref, nextTick, inject } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
+import { CategorySsServiceProxy, TreeSelectOutput, UpdateCategoryInput } from '@/shared/service-proxies';
 
+const _categoryService = new CategorySsServiceProxy(inject('$baseurl'), inject('$api'));
 // 定义子组件向父组件传值/事件
 const emit = defineEmits(['refresh']);
 
@@ -101,7 +101,7 @@ const rules = reactive<FormRules>({
 });
 const state = reactive({
 	ruleForm: {
-		id: 0,
+		id: '',
 		status: 0,
 		sort: 100,
 	} as UpdateCategoryInput,
@@ -118,15 +118,15 @@ const state = reactive({
 // 打开弹窗
 const openDialog = async (row: UpdateCategoryInput | null = null) => {
 	if (row !== null) {
-		state.ruleForm = { ...row };
+		state.ruleForm = { ...row } as UpdateCategoryInput;
 		state.dialog.title = '修改栏目';
 		state.dialog.submitTxt = '修 改';
 	} else {
 		state.ruleForm = {
-			id: 0,
+			id: '',
 			status: 0,
 			sort: 100,
-		};
+		} as UpdateCategoryInput;
 		state.dialog.title = '新增栏目';
 		state.dialog.submitTxt = '新 增';
 		nextTick(() => {
@@ -134,8 +134,8 @@ const openDialog = async (row: UpdateCategoryInput | null = null) => {
 		});
 	}
 	state.dialog.isShowDialog = true;
-	const { data } = await CategoryApi.treeSelect();
-	state.categoryData = data ?? [];
+	const { result } = await _categoryService.treeSelect();
+	state.categoryData = result ?? [];
 	state.dialog.loading = false;
 };
 // 关闭弹窗
@@ -155,8 +155,10 @@ const onCoverSuccess = (response: any) => {
 const onSubmit = () => {
 	categoryDialogFormRef.value!.validate(async (v) => {
 		if (v) {
-			const { succeeded } = state.ruleForm.id! > 0 ? await CategoryApi.edit(state.ruleForm) : await CategoryApi.add(state.ruleForm);
-			if (succeeded) {
+			const { success } = state.ruleForm.id
+				? await _categoryService.updateCategory(state.ruleForm)
+				: await _categoryService.addCategory(state.ruleForm);
+			if (success) {
 				closeDialog();
 				emit('refresh');
 			}
