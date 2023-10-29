@@ -145,14 +145,11 @@ const columns: ColumnProps[] = [
 ];
 
 const dataCallBack = (data) => {
-	console.log(data);
 	data.rows.forEach((res) => {
 		if (res.birthday) {
 			res.birthday = moment(res.birthday).format('YYYY-MM-DD');
 		}
 	});
-	console.log(data);
-
 	return data;
 };
 

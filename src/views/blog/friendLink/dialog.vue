@@ -74,10 +74,9 @@
 
 <script setup lang="ts" name="friendLinkDialog">
 import type { FormInstance, FormRules } from 'element-plus';
-import { reactive, ref, nextTick, watch } from 'vue';
-import type { UpdateFriendLinkInput } from '@/api/models';
-import FriendLinkApi from '@/api/FriendLinkApi';
-
+import { reactive, ref, nextTick, watch, inject } from 'vue';
+import { CreateOrUpdateFriendInput, FriendLinksServiceProxy } from '@/shared/service-proxies';
+const _friendLinkService = new FriendLinksServiceProxy(inject('$baseurl'), inject('$api'));
 // 定义子组件向父组件传值/事件
 const emit = defineEmits(['refresh']);
 
@@ -111,11 +110,11 @@ const rules = reactive<FormRules>({
 //表单状态
 const state = reactive({
 	ruleForm: {
-		id: 0,
+		id: '',
 		status: 0,
 		sort: 100,
 		isIgnoreCheck: true,
-	} as UpdateFriendLinkInput,
+	} as CreateOrUpdateFriendInput,
 	dialog: {
 		isShowDialog: false,
 		title: '',
@@ -134,15 +133,15 @@ watch(
 );
 
 // 打开弹窗
-const openDialog = async (row: UpdateFriendLinkInput | null) => {
+const openDialog = async (row: CreateOrUpdateFriendInput | null) => {
 	state.dialog.isShowDialog = true;
 	state.dialog.loading = true;
 	if (row != null) {
-		state.ruleForm = { ...row };
+		state.ruleForm = { ...row } as CreateOrUpdateFriendInput;
 		state.dialog.title = '修改友链';
 		state.dialog.submitTxt = '修 改';
 	} else {
-		state.ruleForm.id = 0;
+		state.ruleForm.id = '';
 		state.dialog.title = '新增友链';
 		state.dialog.submitTxt = '新 增';
 		// 重置表单
@@ -164,8 +163,10 @@ const onCancel = () => {
 const onSubmit = async () => {
 	tagDialogFormRef.value?.validate(async (v) => {
 		if (v) {
-			const { succeeded } = state.ruleForm.id === 0 ? await FriendLinkApi.add(state.ruleForm) : await FriendLinkApi.edit(state.ruleForm);
-			if (succeeded) {
+			const { success } = state.ruleForm.id
+				? await _friendLinkService.createOrUpdate(state.ruleForm)
+				: await _friendLinkService.createOrUpdate(state.ruleForm);
+			if (success) {
 				closeDialog();
 				emit('refresh');
 			}

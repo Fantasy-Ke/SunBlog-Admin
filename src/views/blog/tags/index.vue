@@ -1,6 +1,6 @@
 <template>
 	<div class="blog-tag-container layout-padding">
-		<ProTable ref="tableRef" :request-api="getTableList" :columns="columns" :tool-button="false">
+		<ProTable ref="tableRef" :request-api="getTableList" :data-callback="dataCallBack" :columns="columns" :tool-button="false">
 			<!-- v-auth="'tags:add'" -->
 			<template #tools> <el-button type="primary" icon="ele-Plus" @click="onOpen(null)"> 新增 </el-button></template>
 			<template #status="scope">
@@ -33,6 +33,7 @@ const TagDialog = defineAsyncComponent(() => import('./dialog.vue'));
 import ProTable from '@/components/ProTable/index.vue';
 import { ColumnProps } from '@/components/ProTable/interface';
 import { CreateOrUpdateTagInput, TagsPageQueryInput, TagssServiceProxy } from '@/shared/service-proxies';
+import moment from 'moment';
 const _tagsService = new TagssServiceProxy(inject('$baseurl'), inject('$api'));
 //  table实例
 const tableRef = ref<InstanceType<typeof ProTable>>();
@@ -75,6 +76,15 @@ const columns = reactive<ColumnProps[]>([
 		// isShow: auths(['tags:edit', 'tags:delete']),
 	},
 ]);
+
+const dataCallBack = (data) => {
+	data.rows.forEach((res) => {
+		if (res.createdTime) {
+			res.createdTime = moment(res.createdTime).format('YYYY-MM-DD');
+		}
+	});
+	return data;
+};
 
 const getTableList = (params: any) => {
 	let newParams = JSON.parse(JSON.stringify(params)) as TagsPageQueryInput;

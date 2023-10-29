@@ -1,6 +1,6 @@
 <template>
 	<div class="blog-category-container layout-padding">
-		<ProTable ref="tableRef" :request-api="getTableList" :pagination="false" :columns="columns" :tool-button="false">
+		<ProTable ref="tableRef" :request-api="getTableList" :data-callback="dataCallBack" :pagination="false" :columns="columns" :tool-button="false">
 			<template #tools>
 				<!-- v-auth="'category:add'"  -->
 				<el-button type="primary" icon="ele-Plus" @click="onOpenDialog(null)"> 新增 </el-button>
@@ -32,6 +32,7 @@ const CategoryDialog = defineAsyncComponent(() => import('./dialog.vue'));
 import ProTable from '@/components/ProTable/index.vue';
 import type { ColumnProps } from '@/components/ProTable/interface';
 import { CategorySsServiceProxy, KeyDto, UpdateCategoryInput } from '@/shared/service-proxies';
+import moment from 'moment';
 
 const _categoryService = new CategorySsServiceProxy(inject('$baseurl'), inject('$api'));
 
@@ -65,6 +66,15 @@ const columns = reactive<ColumnProps[]>([
 		// isShow: auths(['category:edit', 'category:delete']),
 	},
 ]);
+
+const dataCallBack = (data) => {
+	data.rows.forEach((res) => {
+		if (res.createdTime) {
+			res.createdTime = moment(res.createdTime).format('YYYY-MM-DD');
+		}
+	});
+	return data;
+};
 
 const getTableList = (params: any) => {
 	let newParams = JSON.parse(JSON.stringify(params));

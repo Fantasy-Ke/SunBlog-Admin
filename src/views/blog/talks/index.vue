@@ -1,6 +1,6 @@
 <template>
 	<div class="blog-talks-container layout-padding">
-		<ProTable ref="tableRef" :request-api="getTableList" :columns="columns" :tool-button="false">
+		<ProTable ref="tableRef" :request-api="getTableList" :data-callback="dataCallBack" :columns="columns" :tool-button="false">
 			<!-- v-auth="'talks:add'" -->
 			<template #tools> <el-button type="primary" icon="ele-Plus" @click="onOpen(null)"> 新增 </el-button></template>
 			<template #content="{ row }">
@@ -38,6 +38,7 @@ const TalksDialog = defineAsyncComponent(() => import('./dialog.vue'));
 import ProTable from '@/components/ProTable/index.vue';
 import { ColumnProps } from '@/components/ProTable/interface';
 import { CreateOrUpdateTalksInput, TalksPageQueryInput, TalksSsServiceProxy } from '@/shared/service-proxies';
+import moment from 'moment';
 const _talkService = new TalksSsServiceProxy(inject('$baseurl'), inject('$api'));
 
 //  table实例
@@ -92,6 +93,15 @@ const getTableList = (params: any) => {
 	console.log(params);
 	let newParams = JSON.parse(JSON.stringify(params)) as TalksPageQueryInput;
 	return _talkService.getPage(newParams);
+};
+
+const dataCallBack = (data) => {
+	data.rows.forEach((res) => {
+		if (res.createdTime) {
+			res.createdTime = moment(res.createdTime).format('YYYY-MM-DD');
+		}
+	});
+	return data;
 };
 
 // 删除角色

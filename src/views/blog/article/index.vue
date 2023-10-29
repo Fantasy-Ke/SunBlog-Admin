@@ -2,7 +2,14 @@
 	<div class="blog-article-container layout-padding main-box">
 		<TreeFilter ref="categoryTreeRef" :request-api="getTreeTableList" id="value" :default-value="initParam.categoryId" @change="onChangeTree" />
 		<div class="table-box">
-			<ProTable ref="tableRef" :request-api="getTableList" :columns="columns" :init-param="initParam" :tool-button="false">
+			<ProTable
+				ref="tableRef"
+				:request-api="getTableList"
+				:data-callback="dataCallBack"
+				:columns="columns"
+				:init-param="initParam"
+				:tool-button="false"
+			>
 				<!-- v-auth="'article:add'" -->
 				<template #tools>
 					<el-button
@@ -62,6 +69,7 @@ import type { ColumnProps } from '@/components/ProTable/interface';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
 import { ArticlePageQueryInput, ArticleSsServiceProxy, CategorySsServiceProxy, KeyDto } from '@/shared/service-proxies';
+import moment from 'moment';
 
 const router = useRouter();
 // 表格实例
@@ -70,7 +78,7 @@ const categoryTreeRef = ref<InstanceType<typeof TreeFilter>>();
 const _articleService = new ArticleSsServiceProxy(inject('$baseurl'), inject('$api'));
 const _categoryService = new CategorySsServiceProxy(inject('$baseurl'), inject('$api'));
 
-const initParam = reactive<{ categoryId?: number | string }>({ categoryId: '' });
+const initParam = reactive<{ categoryId?: undefined | string }>({ categoryId: undefined });
 const columns = reactive<ColumnProps[]>([
 	{ type: 'index', label: '序号', width: 60 },
 	{
@@ -85,7 +93,7 @@ const columns = reactive<ColumnProps[]>([
 	{ prop: 'creationType', label: '创作类型', width: 100 },
 	{ prop: 'status', label: '状态', width: 100 },
 	{
-		prop: 'createdTime',
+		prop: 'publishTime',
 		label: '创建时间',
 		width: 180,
 	},
@@ -99,6 +107,15 @@ const columns = reactive<ColumnProps[]>([
 	},
 ]);
 
+const dataCallBack = (data) => {
+	data.rows.forEach((res) => {
+		if (res.publishTime) {
+			res.publishTime = moment(res.publishTime).format('YYYY-MM-DD');
+		}
+	});
+	return data;
+};
+
 const getTableList = (params: any) => {
 	let newParams = JSON.parse(JSON.stringify(params)) as ArticlePageQueryInput;
 	return _articleService.getPage(newParams);
@@ -108,7 +125,7 @@ const getTreeTableList = () => {
 	return _categoryService.treeSelect();
 };
 
-const onChangeTree = (val?: number | string) => {
+const onChangeTree = (val?: undefined | string) => {
 	initParam.categoryId = val;
 };
 
