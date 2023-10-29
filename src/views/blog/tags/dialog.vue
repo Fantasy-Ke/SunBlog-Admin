@@ -57,9 +57,9 @@
 
 <script setup lang="ts" name="tagDialog">
 import type { FormInstance, FormRules } from 'element-plus';
-import { reactive, ref, nextTick } from 'vue';
-import type { UpdateTagInput } from '@/api/models';
-import TagsApi from '@/api/TagsApi';
+import { reactive, ref, nextTick, inject } from 'vue';
+import { CreateOrUpdateTagInput, TagssServiceProxy } from '@/shared/service-proxies';
+const _tagsService = new TagssServiceProxy(inject('$baseurl'), inject('$api'));
 
 // 定义子组件向父组件传值/事件
 const emit = defineEmits(['refresh']);
@@ -83,11 +83,11 @@ const rules = reactive<FormRules>({
 //表单状态
 const state = reactive({
 	ruleForm: {
-		id: 0,
+		id: '',
 		status: 0,
 		color: 'rgba(0, 0, 0, 1)',
 		sort: 100,
-	} as UpdateTagInput,
+	} as CreateOrUpdateTagInput,
 	dialog: {
 		isShowDialog: false,
 		title: '',
@@ -97,15 +97,15 @@ const state = reactive({
 });
 
 // 打开弹窗
-const openDialog = async (row: UpdateTagInput | null) => {
+const openDialog = async (row: CreateOrUpdateTagInput | null) => {
 	state.dialog.isShowDialog = true;
 	state.dialog.loading = true;
 	if (row != null) {
-		state.ruleForm = { ...row };
+		state.ruleForm = { ...row } as CreateOrUpdateTagInput;
 		state.dialog.title = '修改标签';
 		state.dialog.submitTxt = '修 改';
 	} else {
-		state.ruleForm.id = 0;
+		state.ruleForm.id = '';
 		state.dialog.title = '新增标签';
 		state.dialog.submitTxt = '新 增';
 		// 重置表单
@@ -130,8 +130,8 @@ const onCancel = () => {
 const onSubmit = async () => {
 	tagDialogFormRef.value?.validate(async (v) => {
 		if (v) {
-			const { succeeded } = state.ruleForm.id === 0 ? await TagsApi.add(state.ruleForm) : await TagsApi.edit(state.ruleForm);
-			if (succeeded) {
+			const { success } = state.ruleForm.id ? await _tagsService.createOrUpdate(state.ruleForm) : await _tagsService.createOrUpdate(state.ruleForm);
+			if (success) {
 				closeDialog();
 				emit('refresh');
 			}
