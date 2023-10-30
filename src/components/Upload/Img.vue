@@ -51,7 +51,10 @@
 import { ref, computed, inject } from 'vue';
 import { ElNotification, formContextKey, formItemContextKey } from 'element-plus';
 import type { UploadProps, UploadRequestOptions } from 'element-plus';
-import http from '@/utils/http';
+// import http from '@/utils/http';
+import { FileParameter } from '@/shared/service-proxies';
+import apiHttpClient from '@/utils/http';
+// const _fileService = new FilesServiceProxy(inject('$baseurl'), inject('$api'));
 
 interface UploadFileProps {
 	imageUrl: string; // 图片地址 ==> 必传
@@ -118,7 +121,7 @@ const handleHttpUpload = async (options: UploadRequestOptions) => {
 	try {
 		const api = props.api ?? uploadImg;
 		const data = await api(formData);
-		emit('update:imageUrl', data[0].url);
+		emit('update:imageUrl', data.data.result[0].url);
 		// 调用 el-form 内部的校验方法（可自动校验）
 		formItemContext?.prop && formContext?.validateField([formItemContext.prop as string]);
 	} catch (error) {
@@ -130,12 +133,13 @@ const handleHttpUpload = async (options: UploadRequestOptions) => {
  * 上传图片
  * @param params
  */
-const uploadImg = (params: FormData) => {
-	return http.instance.post(`/file/upload`, params, {
-		headers: {
-			'Content-Type': 'multipart/form-data',
-		},
-	});
+//  {
+// 		headers: {
+// 			'Content-Type': 'multipart/form-data',
+// 		},
+// 	}
+const uploadImg = (params: FileParameter) => {
+	return apiHttpClient.upload('api/Files/UploadFile', params);
 };
 
 /**
