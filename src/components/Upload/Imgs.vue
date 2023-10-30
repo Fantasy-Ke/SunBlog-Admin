@@ -48,7 +48,8 @@ import { ref, computed, inject, watch } from 'vue';
 import { Plus } from '@element-plus/icons-vue';
 import type { UploadProps, UploadFile, UploadUserFile, UploadRequestOptions } from 'element-plus';
 import { ElNotification, formContextKey, formItemContextKey } from 'element-plus';
-import http from '@/utils/http';
+import { FileParameter } from '@/shared/service-proxies';
+import apiHttpClient from '@/utils/http';
 
 interface UploadFileProps {
 	fileList: UploadUserFile[];
@@ -128,7 +129,7 @@ const handleHttpUpload = async (options: UploadRequestOptions) => {
 	try {
 		const api = props.api ?? uploadImg;
 		const data = await api(formData);
-		const url = data[0].url;
+		const url = data.data.result[0].url;
 		options.onSuccess(url);
 	} catch (error) {
 		options.onError(error as any);
@@ -161,12 +162,8 @@ const uploadSuccess = (response: string | undefined, uploadFile: UploadFile) => 
  * 上传图片
  * @param params
  */
-const uploadImg = (params: FormData) => {
-	return http.instance.post(`/file/upload`, params, {
-		headers: {
-			'Content-Type': 'Content-Type',
-		},
-	});
+const uploadImg = (params: FileParameter) => {
+	return apiHttpClient.upload('api/Files/UploadFile', params);
 };
 
 /**
