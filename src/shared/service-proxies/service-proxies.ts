@@ -4095,6 +4095,90 @@ export class MenusServiceProxy {
     }
 }
 
+export class FilesServiceProxy {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * 上传附件
+     * @param file (optional) 
+     * @return Success
+     */
+    uploadFile(file: FileParameter | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<UploadFileOutput[]>> {
+        let url_ = this.baseUrl + "/api/Files/UploadFile";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = new FormData();
+        if (file === null || file === undefined)
+            throw new Error("The parameter 'file' cannot be null.");
+        else
+            content_.append("file", file.data, file.fileName ? file.fileName : "file");
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUploadFile(_response);
+        });
+    }
+
+    protected processUploadFile(response: AxiosResponse): Promise<ZEngineResponse<UploadFileOutput[]>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let result200Data: any = null;
+            let resultData200  = _responseText.result;
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(UploadFileOutput.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            result200Data = ZEngineResponse.fromJS(_responseText);
+            result200Data.result = result200;
+            return Promise.resolve<ZEngineResponse<UploadFileOutput[]>>(result200Data);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<UploadFileOutput[]>>(null as any);
+    }
+}
+
 export class CustomConfigItemsServiceProxy {
     protected instance: AxiosInstance;
     protected baseUrl: string;
@@ -13045,6 +13129,57 @@ export interface IUpdateUserInput {
     id: string | undefined;
 }
 
+export class UploadFileOutput implements IUploadFileOutput {
+    /** 文件名 */
+    name: string | undefined;
+    /** 附件链接 */
+    url: string | undefined;
+
+    constructor(data?: IUploadFileOutput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.url = _data["url"];
+        }
+    }
+
+    static fromJS(data: any): UploadFileOutput {
+        data = typeof data === 'object' ? data : {};
+        let result = new UploadFileOutput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["url"] = this.url;
+        return data;
+    }
+
+    clone(): UploadFileOutput {
+        const json = this.toJSON();
+        let result = new UploadFileOutput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IUploadFileOutput {
+    /** 文件名 */
+    name: string | undefined;
+    /** 附件链接 */
+    url: string | undefined;
+}
+
 export class UserInfoOutput implements IUserInfoOutput {
     /** Id */
     id: string | undefined;
@@ -13649,6 +13784,11 @@ export interface IZUserInfoOutput {
     orgName: string | undefined;
     /** 授权按钮 */
     authBtnList: string[] | undefined;
+}
+
+export interface FileParameter {
+    data: any;
+    fileName: string;
 }
 
 export class SwaggerException extends Error {
