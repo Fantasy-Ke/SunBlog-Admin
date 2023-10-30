@@ -8,7 +8,7 @@
 						multiple
 						:show-file-list="false"
 						:with-credentials="true"
-						action="/api/file/upload"
+						action="/api/Files/UploadFile"
 						:on-success="onUploadSuccess"
 						><el-button type="primary">上传图片</el-button></el-upload
 					>
@@ -94,8 +94,8 @@ const onHandleCurrentChange = (val: number) => {
 //上传成功
 const onUploadSuccess = async (res: any) => {
 	state.loading = true;
-	if (res && res.length > 0) {
-		_pictureService.addPictures({ albumId: state.tableData.param.id, url: res[0].url } as AddPictureInput);
+	if (res.success && res.result) {
+		_pictureService.addPictures({ albumId: state.tableData.param.id, url: res.result[0].url } as AddPictureInput);
 		await loadData();
 	}
 	state.loading = false;

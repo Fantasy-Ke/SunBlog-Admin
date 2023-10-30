@@ -5,7 +5,7 @@
 				<el-row :gutter="35">
 					<el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
 						<el-form-item label="封面" prop="cover">
-							<el-upload class="avatar-uploader" action="/api/file/upload" accept="image/*" :show-file-list="false" :on-success="onCoverSuccess">
+							<el-upload class="avatar-uploader" action="/api/Files/UploadFile" accept="image/*" :show-file-list="false" :on-success="onCoverSuccess">
 								<img v-if="state.ruleForm.cover" :src="state.ruleForm.cover" class="avatar" />
 								<el-icon v-else class="avatar-uploader-icon fa fa-plus"> </el-icon>
 							</el-upload>
@@ -98,6 +98,8 @@ const state = reactive({
 
 // 打开弹窗
 const openDialog = async (row: CreateOrUpdateTagInput | null) => {
+	console.log(row);
+
 	state.dialog.isShowDialog = true;
 	state.dialog.loading = true;
 	if (row != null) {
@@ -105,7 +107,7 @@ const openDialog = async (row: CreateOrUpdateTagInput | null) => {
 		state.dialog.title = '修改标签';
 		state.dialog.submitTxt = '修 改';
 	} else {
-		state.ruleForm.id = '';
+		state.ruleForm.id = undefined;
 		state.dialog.title = '新增标签';
 		state.dialog.submitTxt = '新 增';
 		// 重置表单
@@ -116,7 +118,7 @@ const openDialog = async (row: CreateOrUpdateTagInput | null) => {
 	state.dialog.loading = false;
 };
 const onCoverSuccess = (response: any) => {
-	state.ruleForm.cover = response[0].url;
+	state.ruleForm.cover = response.result[0].url;
 };
 // 关闭弹窗
 const closeDialog = () => {
