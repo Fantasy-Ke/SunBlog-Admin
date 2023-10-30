@@ -56,7 +56,7 @@ const columns = reactive<ColumnProps[]>([
 		label: '排序',
 	},
 	{
-		prop: 'createdTime',
+		prop: 'creationTime',
 		label: '创建时间',
 	},
 	{
@@ -68,11 +68,13 @@ const columns = reactive<ColumnProps[]>([
 ]);
 
 const dataCallBack = (data) => {
-	data.rows.forEach((res) => {
-		if (res.createdTime) {
-			res.createdTime = moment(res.createdTime).format('YYYY-MM-DD');
+	data.forEach((res) => {
+		if (res.creationTime) {
+			res.creationTime = moment(res.creationTime).format('YYYY-MM-DD');
 		}
 	});
+	console.log(data);
+
 	return data;
 };
 

@@ -8627,7 +8627,7 @@ export class CategoryPageOutput implements ICategoryPageOutput {
     /** 备注 */
     remark: string | undefined;
     /** 创建时间 */
-    createdTime: moment.Moment;
+    creationTime: moment.Moment | undefined;
     /** 子栏目 */
     children: CategoryPageOutput[] | undefined;
 
@@ -8649,7 +8649,7 @@ export class CategoryPageOutput implements ICategoryPageOutput {
             this.status = _data["status"];
             this.sort = _data["sort"];
             this.remark = _data["remark"];
-            this.createdTime = _data["createdTime"] ? moment(_data["createdTime"].toString()) : <any>undefined;
+            this.creationTime = _data["creationTime"] ? moment(_data["creationTime"].toString()) : <any>undefined;
             if (Array.isArray(_data["children"])) {
                 this.children = [] as any;
                 for (let item of _data["children"])
@@ -8674,7 +8674,7 @@ export class CategoryPageOutput implements ICategoryPageOutput {
         data["status"] = this.status;
         data["sort"] = this.sort;
         data["remark"] = this.remark;
-        data["createdTime"] = this.createdTime ? this.createdTime.toISOString() : <any>undefined;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
         if (Array.isArray(this.children)) {
             data["children"] = [];
             for (let item of this.children)
@@ -8706,7 +8706,7 @@ export interface ICategoryPageOutput {
     /** 备注 */
     remark: string | undefined;
     /** 创建时间 */
-    createdTime: moment.Moment;
+    creationTime: moment.Moment | undefined;
     /** 子栏目 */
     children: CategoryPageOutput[] | undefined;
 }
