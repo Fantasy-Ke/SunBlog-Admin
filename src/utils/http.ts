@@ -55,7 +55,7 @@ export function getJWTDate(timestamp: number): Date {
 	return new Date(timestamp * 1000);
 }
 
-class apiHttpClient {
+export class apiHttpClient {
 	// axios 实例
 	readonly instance: AxiosInstance;
 
@@ -66,7 +66,7 @@ class apiHttpClient {
 		this.instance = axios.create(Object.assign(this.baseConfig, config));
 		this.instance.interceptors.request.use(
 			(config: InternalAxiosRequestConfig) => {
-				const accessToken = Session.get<string>(accessTokenKey);
+				const accessToken = Session.get(accessTokenKey);
 				if (accessToken) {
 					// 将 token 添加到请求报文头中
 					config.headers!['Authorization'] = `Bearer ${accessToken}`;
@@ -77,7 +77,7 @@ class apiHttpClient {
 					//token已过期
 					if (new Date() >= exp) {
 						// 获取刷新 token
-						const refreshAccessToken = Session.get<string>(refreshAccessTokenKey);
+						const refreshAccessToken = Session.get(refreshAccessTokenKey);
 						// 携带刷新 token
 						if (refreshAccessToken) {
 							config.headers!['X-Authorization'] = `Bearer ${refreshAccessToken}`;
