@@ -216,7 +216,7 @@ import '@wangeditor/editor/dist/css/style.css';
 import html2markdown from '@notable/html2markdown';
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue';
 import type { IDomEditor, IEditorConfig, IToolbarConfig } from '@wangeditor/editor';
-import http from '@/utils/http';
+import http, { apiHttpClient } from '@/utils/http';
 import { type FormRules, type FormInstance, ElMessage } from 'element-plus';
 import { useRoute } from 'vue-router';
 type ImageUploadType = (url: string, alt: string, href: string) => void;
@@ -226,10 +226,13 @@ import {
 	ArticleSsServiceProxy,
 	CategorySsServiceProxy,
 	CreateOrUpdateArticleInput,
+	FileParameter,
+	FilesServiceProxy,
 	SelectOutput,
 	TagssServiceProxy,
 	TreeSelectOutput,
 } from '@/shared/service-proxies';
+import { AxiosInstance } from 'axios';
 
 const route = useRoute();
 const _articleService = new ArticleSsServiceProxy(inject('$baseurl'), inject('$api'));
@@ -331,20 +334,24 @@ const state = reactive({
 			uploadImage: {
 				//富文本编辑器图片上传
 				async customUpload(file: File, insertFn: ImageUploadType) {
-					const data = await http.upload('/file/upload', { file });
-					if (data && data.length > 0) {
-						insertFn(data[0].url, '', '');
-					}
+					await _fileService.uploadFile({ fileName: file.name, data: file } as FileParameter).then((res) => {
+						let data = res.result;
+						if (data && data.length > 0) {
+							insertFn(data[0].url, '', '');
+						}
+					});
+					//const data = apiHttpClient.upload('api/Files/UploadFile', params);
 				},
 			},
 			uploadVideo: {
 				//上传视频
 				async customUpload(file: File, insertFn: VideoUploadType) {
-					const data = await http.upload('/file/upload', { file });
-					if (data && data.length > 0) {
-						// 视频url和视频封面
-						insertFn(data[0].url, '');
-					}
+					await _fileService.uploadFile({ fileName: file.name, data: file } as FileParameter).then((res) => {
+						let data = res.result;
+						if (data && data.length > 0) {
+							insertFn(data[0].url, '');
+						}
+					});
 				},
 			},
 		} as unknown,
@@ -411,12 +418,16 @@ const onChangeEditor = (v: boolean) => {
 };
 // markdown上传文件
 const onUploadMdImg = async (pos: any, file: any) => {
-	const fd = new FormData();
-	fd.append('file', file);
-	const data = await http.upload('/file/upload', fd);
-	if (data && data.length > 0) {
-		mdRef.value.$img2Url(pos, data[0].url);
-	}
+	_fileService.uploadFile({ fileName: file.name, data: file } as FileParameter).then((res) => {
+		let data = res.result;
+		if (data && data.length > 0) {
+			mdRef.value.$img2Url(pos, data[0].url);
+		}
+	});
+	// const data = await http.upload('/file/upload', fd);
+	// if (data && data.length > 0) {
+	// 	mdRef.value.$img2Url(pos, data[0].url);
+	// }
 };
 // 保存
 const onSave = async () => {
@@ -436,7 +447,12 @@ const onCancel = () => {
 	miitBus.emit('onCurrentContextmenuClick', Object.assign({}, { contextMenuClickId: 1, ...route }));
 };
 
+let baseapi: apiHttpClient;
+let _fileService: FilesServiceProxy;
+
 onMounted(async () => {
+	baseapi = new apiHttpClient({ headers: { 'Content-Type': 'multipart/form-data' } });
+	_fileService = new FilesServiceProxy(inject('$baseurl'), baseapi as unknown as AxiosInstance);
 	// 获取栏目和标签
 	const [c, t] = await Promise.all([_categoryService.treeSelect(), _tagsService.select()]);
 	state.form.id = (route.query.id as never) ?? 0;
