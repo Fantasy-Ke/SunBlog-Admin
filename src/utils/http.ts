@@ -68,9 +68,6 @@ export class apiHttpClient {
 			(config: InternalAxiosRequestConfig) => {
 				const accessToken = Session.get(accessTokenKey);
 				if (accessToken) {
-					// 将 token 添加到请求报文头中
-					config.headers!['Authorization'] = `Bearer ${accessToken}`;
-
 					// 判断 accessToken 是否过期
 					const jwt: any = decryptJWT(accessToken);
 					const exp = getJWTDate(jwt.exp as number);
@@ -97,10 +94,6 @@ export class apiHttpClient {
 				// 检查并存储授权信息
 				checkAndStoreAuthentication(res);
 				const data = res.data;
-				if (res.config.url?.toLocaleLowerCase() === '/file/upload'.toLowerCase()) {
-					return res;
-				}
-
 				// code为200 或 返回的是文件流 直接返回
 				if (data.statusCode === 200 || res.config.responseType === 'blob') {
 					return res;
