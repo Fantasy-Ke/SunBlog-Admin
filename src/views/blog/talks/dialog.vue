@@ -81,12 +81,13 @@
 <script setup lang="ts" name="tagDialog">
 import '@wangeditor/editor/dist/css/style.css';
 import type { FormInstance, FormRules } from 'element-plus';
-import { reactive, ref, nextTick, shallowRef, onBeforeUnmount, inject } from 'vue';
+import { reactive, ref, nextTick, shallowRef, onBeforeUnmount, inject, onMounted } from 'vue';
 import UploadImgs from '@/components/Upload/Imgs.vue';
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue';
 import type { IDomEditor, IEditorConfig, IToolbarConfig } from '@wangeditor/editor';
-import http from '@/utils/http';
-import { CreateOrUpdateTalksInput, TalksSsServiceProxy } from '@/shared/service-proxies';
+import { apiHttpClient } from '@/utils/http';
+import { CreateOrUpdateTalksInput, FileParameter, FilesServiceProxy, TalksSsServiceProxy } from '@/shared/service-proxies';
+import { AxiosInstance } from 'axios';
 type ImageUploadType = (url: string, alt: string, href: string) => void;
 type VideoUploadType = (url: string, poster: string) => void;
 const _talkService = new TalksSsServiceProxy(inject('$baseurl'), inject('$api'));
@@ -124,20 +125,23 @@ const state = reactive({
 			uploadImage: {
 				//富文本编辑器图片上传
 				async customUpload(file: File, insertFn: ImageUploadType) {
-					const data = await http.upload('/file/upload', { file });
-					if (data && data.length > 0) {
-						insertFn(data[0].url, '', '');
-					}
+					await _fileService.uploadFile({ fileName: file.name, data: file } as FileParameter).then((res) => {
+						let data = res.result;
+						if (data && data.length > 0) {
+							insertFn(data[0].url, '', '');
+						}
+					});
 				},
 			},
 			uploadVideo: {
 				//上传视频
 				async customUpload(file: File, insertFn: VideoUploadType) {
-					const data = await http.upload('/file/upload', { file });
-					if (data && data.length > 0) {
-						// 视频url和视频封面
-						insertFn(data[0].url, '');
-					}
+					await _fileService.uploadFile({ fileName: file.name, data: file } as FileParameter).then((res) => {
+						let data = res.result;
+						if (data && data.length > 0) {
+							insertFn(data[0].url, '');
+						}
+					});
 				},
 			},
 		} as unknown,
@@ -146,6 +150,12 @@ const state = reactive({
 		toolbarKeys: ['emotion'],
 	} as IToolbarConfig, // 富文本编辑器工具栏配置
 	mode: 'default', // 富文本编辑器模式
+});
+let baseapi: apiHttpClient;
+let _fileService: FilesServiceProxy;
+onMounted(async () => {
+	baseapi = new apiHttpClient({ headers: { 'Content-Type': 'multipart/form-data' } });
+	_fileService = new FilesServiceProxy(inject('$baseurl'), baseapi as unknown as AxiosInstance);
 });
 
 // 创建wangEditor富文本编辑器实例

@@ -8,7 +8,7 @@
 						<div class="personal-user-left">
 							<el-upload
 								class="h100 personal-user-left-upload"
-								action="/api/file/upload"
+								action="/api/Files/UploadFile"
 								:with-credentials="true"
 								accept="image/*"
 								:limit="1"
@@ -291,9 +291,9 @@ const onSave = async () => {
 };
 // 上传头像回调
 const onSuccess = async (response: any) => {
-	const { success } = await _userSysService.uploadAvatar(response[0].url);
+	const { success } = await _userSysService.uploadAvatar(response.result[0].url);
 	if (success) {
-		model.info.avatar = response[0].url;
+		model.info.avatar = response.result[0].url;
 		await storeUser.getUserInfo();
 		ElMessage.success('修改头像成功');
 	}

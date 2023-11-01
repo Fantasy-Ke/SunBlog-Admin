@@ -216,7 +216,7 @@ import '@wangeditor/editor/dist/css/style.css';
 import html2markdown from '@notable/html2markdown';
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue';
 import type { IDomEditor, IEditorConfig, IToolbarConfig } from '@wangeditor/editor';
-import http, { apiHttpClient } from '@/utils/http';
+import { apiHttpClient } from '@/utils/http';
 import { type FormRules, type FormInstance, ElMessage } from 'element-plus';
 import { useRoute } from 'vue-router';
 type ImageUploadType = (url: string, alt: string, href: string) => void;
