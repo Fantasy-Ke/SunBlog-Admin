@@ -78,8 +78,8 @@ import { initBackEndControlRoutes } from '@/router/backEnd';
 import { Session } from '@/utils/storage';
 import { formatAxis } from '@/utils/formatTime';
 import { NextLoading } from '@/utils/loading';
-import { UsersServiceProxy, ZUserInfoDto } from '@/shared/service-proxies';
-const _usersCService = new UsersServiceProxy(inject('$baseurl'), inject('$api'));
+import { AuthsServiceProxy, ZUserInfoDto } from '@/shared/service-proxies';
+const _authService = new AuthsServiceProxy(inject('$baseurl'), inject('$api'));
 // 定义变量内容
 const { t } = useI18n();
 const storesThemeConfig = useThemeConfig();
@@ -135,7 +135,7 @@ const currentTime = computed(() => {
  * 验证码
  */
 const captchaUrl = computed(() => {
-	return inject('$baseurl') + `/api/users/captcha?id=${state.ruleForm.id}&r=${state.random}`;
+	return inject('$baseurl') + `/api/Auths/Captcha?id=${state.ruleForm.id}&r=${state.random}`;
 });
 
 const onCaptchaChange = () => {
@@ -147,7 +147,7 @@ const onSignIn = async () => {
 	formRef.value!.validate(async (valid) => {
 		if (valid) {
 			state.loading.signIn = true;
-			await _usersCService
+			await _authService
 				.signIn(state.ruleForm)
 				.then(async (res) => {
 					if (res.statusCode === 200) {
