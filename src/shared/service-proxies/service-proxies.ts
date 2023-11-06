@@ -3385,6 +3385,186 @@ export class MenusServiceProxy {
     }
 }
 
+export class FriendLinksServiceProxy {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * 添加修改
+     * @param body (optional) 
+     * @return Success
+     */
+    createOrUpdate(body: CreateOrUpdateFriendInput | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
+        let url_ = this.baseUrl + "/api/FriendLinks/CreateOrUpdate";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processCreateOrUpdate(_response);
+        });
+    }
+
+    protected processCreateOrUpdate(response: AxiosResponse): Promise<ZEngineResponse<void>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<ZEngineResponse<void>>(_responseText);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<void>>(null as any);
+    }
+
+    /**
+     * 删除
+     * @param id (optional) 
+     * @return Success
+     */
+    delete(id: string | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
+        let url_ = this.baseUrl + "/api/FriendLinks/Delete?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "DELETE",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDelete(_response);
+        });
+    }
+
+    protected processDelete(response: AxiosResponse): Promise<ZEngineResponse<void>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<ZEngineResponse<void>>(_responseText);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<void>>(null as any);
+    }
+
+    /**
+     * 标签列表分页查询
+     * @param body (optional) 
+     * @return Success
+     */
+    getPage(body: FriendLinkPageQueryInput | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<FriendLinkPageOutputPageResult>> {
+        let url_ = this.baseUrl + "/api/FriendLinks/GetPage";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetPage(_response);
+        });
+    }
+
+    protected processGetPage(response: AxiosResponse): Promise<ZEngineResponse<FriendLinkPageOutputPageResult>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let result200Data: any = null;
+            let resultData200  = _responseText.result;
+            result200 = FriendLinkPageOutputPageResult.fromJS(resultData200);
+            result200Data = ZEngineResponse.fromJS(_responseText);
+            result200Data.result = result200;
+            return Promise.resolve<ZEngineResponse<FriendLinkPageOutputPageResult>>(result200Data);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<FriendLinkPageOutputPageResult>>(null as any);
+    }
+}
+
 export class FilesServiceProxy {
     protected instance: AxiosInstance;
     protected baseUrl: string;
@@ -3501,6 +3681,511 @@ export class FilesServiceProxy {
     }
 
     protected processGetFile(response: AxiosResponse): Promise<ZEngineResponse<void>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<ZEngineResponse<void>>(_responseText);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<void>>(null as any);
+    }
+}
+
+export class CustomConfigsServiceProxy {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * 获取自定义配置
+     * @param code (optional) 自定义配置唯一编码
+     * @return Success
+     */
+    getConfig(code: string | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
+        let url_ = this.baseUrl + "/api/CustomConfigs/GetConfig?";
+        if (code === null)
+            throw new Error("The parameter 'code' cannot be null.");
+        else if (code !== undefined)
+            url_ += "code=" + encodeURIComponent("" + code) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetConfig(_response);
+        });
+    }
+
+    protected processGetConfig(response: AxiosResponse): Promise<ZEngineResponse<void>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<ZEngineResponse<void>>(_responseText);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<void>>(null as any);
+    }
+
+    /**
+     * 自定义配置分页查询
+     * @param body (optional) 
+     * @return Success
+     */
+    getPage(body: CustomConfigQueryInput | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<CustomConfigPageOutputPageResult>> {
+        let url_ = this.baseUrl + "/api/CustomConfigs/GetPage";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetPage(_response);
+        });
+    }
+
+    protected processGetPage(response: AxiosResponse): Promise<ZEngineResponse<CustomConfigPageOutputPageResult>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let result200Data: any = null;
+            let resultData200  = _responseText.result;
+            result200 = CustomConfigPageOutputPageResult.fromJS(resultData200);
+            result200Data = ZEngineResponse.fromJS(_responseText);
+            result200Data.result = result200;
+            return Promise.resolve<ZEngineResponse<CustomConfigPageOutputPageResult>>(result200Data);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<CustomConfigPageOutputPageResult>>(null as any);
+    }
+
+    /**
+     * 添加自定义配置
+     * @param body (optional) 
+     * @return Success
+     */
+    addConfig(body: AddCustomConfigInput | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
+        let url_ = this.baseUrl + "/api/CustomConfigs/AddConfig";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processAddConfig(_response);
+        });
+    }
+
+    protected processAddConfig(response: AxiosResponse): Promise<ZEngineResponse<void>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<ZEngineResponse<void>>(_responseText);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<void>>(null as any);
+    }
+
+    /**
+     * 修改自定义配置
+     * @param body (optional) 
+     * @return Success
+     */
+    updateConfig(body: UpdateCustomConfigInput | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
+        let url_ = this.baseUrl + "/api/CustomConfigs/UpdateConfig";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpdateConfig(_response);
+        });
+    }
+
+    protected processUpdateConfig(response: AxiosResponse): Promise<ZEngineResponse<void>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<ZEngineResponse<void>>(_responseText);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<void>>(null as any);
+    }
+
+    /**
+     * 获取配置表单设计和表单数据
+     * @param body (optional) 
+     * @return Success
+     */
+    getFormJson(body: GetConfigDetailInput | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<CustomConfigDetailOutput>> {
+        let url_ = this.baseUrl + "/api/CustomConfigs/GetFormJson";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetFormJson(_response);
+        });
+    }
+
+    protected processGetFormJson(response: AxiosResponse): Promise<ZEngineResponse<CustomConfigDetailOutput>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let result200Data: any = null;
+            let resultData200  = _responseText.result;
+            result200 = CustomConfigDetailOutput.fromJS(resultData200);
+            result200Data = ZEngineResponse.fromJS(_responseText);
+            result200Data.result = result200;
+            return Promise.resolve<ZEngineResponse<CustomConfigDetailOutput>>(result200Data);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<CustomConfigDetailOutput>>(null as any);
+    }
+
+    /**
+     * 修改配置表单设计
+     * @param body (optional) 
+     * @return Success
+     */
+    setJson(body: CustomConfigSetJsonInput | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
+        let url_ = this.baseUrl + "/api/CustomConfigs/SetJson";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PATCH",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processSetJson(_response);
+        });
+    }
+
+    protected processSetJson(response: AxiosResponse): Promise<ZEngineResponse<void>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<ZEngineResponse<void>>(_responseText);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<void>>(null as any);
+    }
+
+    /**
+     * 生成自定配置类
+     * @param body (optional) 
+     * @return Success
+     */
+    generate(body: KeyDto | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
+        let url_ = this.baseUrl + "/api/CustomConfigs/Generate";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGenerate(_response);
+        });
+    }
+
+    protected processGenerate(response: AxiosResponse): Promise<ZEngineResponse<void>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<ZEngineResponse<void>>(_responseText);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<void>>(null as any);
+    }
+
+    /**
+     * 删除信息
+     * @param id (optional) 
+     * @return Success
+     */
+    delete(id: string | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
+        let url_ = this.baseUrl + "/api/CustomConfigs/Delete?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "DELETE",
+            url: url_,
+            headers: {
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDelete(_response);
+        });
+    }
+
+    protected processDelete(response: AxiosResponse): Promise<ZEngineResponse<void>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            return Promise.resolve<ZEngineResponse<void>>(_responseText);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<void>>(null as any);
+    }
+
+    /**
+     * 删除自定义配置类
+     * @param body (optional) 
+     * @return Success
+     */
+    deleteClass(body: KeyDto | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
+        let url_ = this.baseUrl + "/api/CustomConfigs/DeleteClass";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PATCH",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processDeleteClass(_response);
+        });
+    }
+
+    protected processDeleteClass(response: AxiosResponse): Promise<ZEngineResponse<void>> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -3700,81 +4385,14 @@ export class CustomConfigItemsServiceProxy {
         }
         return Promise.resolve<ZEngineResponse<void>>(null as any);
     }
-}
-
-export class FriendLinksServiceProxy {
-    protected instance: AxiosInstance;
-    protected baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(baseUrl?: string, instance?: AxiosInstance) {
-
-        this.instance = instance || axios.create();
-
-        this.baseUrl = baseUrl ?? "";
-
-    }
 
     /**
-     * 添加修改
-     * @param body (optional) 
-     * @return Success
-     */
-    createOrUpdate(body: CreateOrUpdateFriendInput | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
-        let url_ = this.baseUrl + "/api/FriendLinks/CreateOrUpdate";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processCreateOrUpdate(_response);
-        });
-    }
-
-    protected processCreateOrUpdate(response: AxiosResponse): Promise<ZEngineResponse<void>> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (let k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            return Promise.resolve<ZEngineResponse<void>>(_responseText);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<ZEngineResponse<void>>(null as any);
-    }
-
-    /**
-     * 删除
+     * 删除信息
      * @param id (optional) 
      * @return Success
      */
     delete(id: string | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
-        let url_ = this.baseUrl + "/api/FriendLinks/Delete?";
+        let url_ = this.baseUrl + "/api/CustomConfigItems/Delete?";
         if (id === null)
             throw new Error("The parameter 'id' cannot be null.");
         else if (id !== undefined)
@@ -3819,66 +4437,6 @@ export class FriendLinksServiceProxy {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
         return Promise.resolve<ZEngineResponse<void>>(null as any);
-    }
-
-    /**
-     * 标签列表分页查询
-     * @param body (optional) 
-     * @return Success
-     */
-    getPage(body: FriendLinkPageQueryInput | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<FriendLinkPageOutputPageResult>> {
-        let url_ = this.baseUrl + "/api/FriendLinks/GetPage";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
-
-        let options_: AxiosRequestConfig = {
-            data: content_,
-            method: "POST",
-            url: url_,
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "text/plain"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processGetPage(_response);
-        });
-    }
-
-    protected processGetPage(response: AxiosResponse): Promise<ZEngineResponse<FriendLinkPageOutputPageResult>> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (let k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let result200Data: any = null;
-            let resultData200  = _responseText.result;
-            result200 = FriendLinkPageOutputPageResult.fromJS(resultData200);
-            result200Data = ZEngineResponse.fromJS(_responseText);
-            result200Data.result = result200;
-            return Promise.resolve<ZEngineResponse<FriendLinkPageOutputPageResult>>(result200Data);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<ZEngineResponse<FriendLinkPageOutputPageResult>>(null as any);
     }
 }
 
@@ -6355,6 +6913,79 @@ export interface IAddCommentInput {
     replyAccountId: string | undefined;
     /** 评论内容 */
     content: string;
+}
+
+export class AddCustomConfigInput implements IAddCustomConfigInput {
+    /** 配置名称 */
+    name: string;
+    /** 配置唯一编码（类名） */
+    code: string;
+    /** 是否是多项（集合） */
+    isMultiple: boolean;
+    /** 是否允许创建实体 */
+    allowCreationEntity: boolean;
+    status: AvailabilityStatus;
+    /** 备注 */
+    remark: string | undefined;
+
+    constructor(data?: IAddCustomConfigInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.code = _data["code"];
+            this.isMultiple = _data["isMultiple"];
+            this.allowCreationEntity = _data["allowCreationEntity"];
+            this.status = _data["status"];
+            this.remark = _data["remark"];
+        }
+    }
+
+    static fromJS(data: any): AddCustomConfigInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new AddCustomConfigInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["code"] = this.code;
+        data["isMultiple"] = this.isMultiple;
+        data["allowCreationEntity"] = this.allowCreationEntity;
+        data["status"] = this.status;
+        data["remark"] = this.remark;
+        return data;
+    }
+
+    clone(): AddCustomConfigInput {
+        const json = this.toJSON();
+        let result = new AddCustomConfigInput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IAddCustomConfigInput {
+    /** 配置名称 */
+    name: string;
+    /** 配置唯一编码（类名） */
+    code: string;
+    /** 是否是多项（集合） */
+    isMultiple: boolean;
+    /** 是否允许创建实体 */
+    allowCreationEntity: boolean;
+    status: AvailabilityStatus;
+    /** 备注 */
+    remark: string | undefined;
 }
 
 export class AddCustomConfigItemInput implements IAddCustomConfigItemInput {
@@ -9695,6 +10326,63 @@ export enum CreationType {
     _1 = 1,
 }
 
+export class CustomConfigDetailOutput implements ICustomConfigDetailOutput {
+    /** 表单渲染Json */
+    formJson: string | undefined;
+    /** 表单数据 */
+    dataJson: string | undefined;
+    /** 配置项Id */
+    itemId: string;
+
+    constructor(data?: ICustomConfigDetailOutput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.formJson = _data["formJson"];
+            this.dataJson = _data["dataJson"];
+            this.itemId = _data["itemId"];
+        }
+    }
+
+    static fromJS(data: any): CustomConfigDetailOutput {
+        data = typeof data === 'object' ? data : {};
+        let result = new CustomConfigDetailOutput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["formJson"] = this.formJson;
+        data["dataJson"] = this.dataJson;
+        data["itemId"] = this.itemId;
+        return data;
+    }
+
+    clone(): CustomConfigDetailOutput {
+        const json = this.toJSON();
+        let result = new CustomConfigDetailOutput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICustomConfigDetailOutput {
+    /** 表单渲染Json */
+    formJson: string | undefined;
+    /** 表单数据 */
+    dataJson: string | undefined;
+    /** 配置项Id */
+    itemId: string;
+}
+
 export class CustomConfigItemQueryInput implements ICustomConfigItemQueryInput {
     pageNo: number;
     pageSize: number;
@@ -9746,6 +10434,274 @@ export interface ICustomConfigItemQueryInput {
     pageSize: number;
     /** 配置ID */
     id: string;
+}
+
+export class CustomConfigPageOutput implements ICustomConfigPageOutput {
+    /** 自定义配置Id */
+    id: string;
+    status: AvailabilityStatus;
+    /** 备注 */
+    remark: string | undefined;
+    /** 配置名称 */
+    name: string | undefined;
+    /** 唯一编码 */
+    code: string | undefined;
+    /** 是否是多项配置 */
+    isMultiple: boolean;
+    /** 是否允许创建实体 */
+    allowCreationEntity: boolean;
+    /** 是否已生成实体 */
+    isGenerate: boolean;
+    /** 创建时间 */
+    createdTime: moment.Moment | undefined;
+
+    constructor(data?: ICustomConfigPageOutput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.status = _data["status"];
+            this.remark = _data["remark"];
+            this.name = _data["name"];
+            this.code = _data["code"];
+            this.isMultiple = _data["isMultiple"];
+            this.allowCreationEntity = _data["allowCreationEntity"];
+            this.isGenerate = _data["isGenerate"];
+            this.createdTime = _data["createdTime"] ? moment(_data["createdTime"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): CustomConfigPageOutput {
+        data = typeof data === 'object' ? data : {};
+        let result = new CustomConfigPageOutput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["status"] = this.status;
+        data["remark"] = this.remark;
+        data["name"] = this.name;
+        data["code"] = this.code;
+        data["isMultiple"] = this.isMultiple;
+        data["allowCreationEntity"] = this.allowCreationEntity;
+        data["isGenerate"] = this.isGenerate;
+        data["createdTime"] = this.createdTime ? this.createdTime.toISOString() : <any>undefined;
+        return data;
+    }
+
+    clone(): CustomConfigPageOutput {
+        const json = this.toJSON();
+        let result = new CustomConfigPageOutput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICustomConfigPageOutput {
+    /** 自定义配置Id */
+    id: string;
+    status: AvailabilityStatus;
+    /** 备注 */
+    remark: string | undefined;
+    /** 配置名称 */
+    name: string | undefined;
+    /** 唯一编码 */
+    code: string | undefined;
+    /** 是否是多项配置 */
+    isMultiple: boolean;
+    /** 是否允许创建实体 */
+    allowCreationEntity: boolean;
+    /** 是否已生成实体 */
+    isGenerate: boolean;
+    /** 创建时间 */
+    createdTime: moment.Moment | undefined;
+}
+
+export class CustomConfigPageOutputPageResult implements ICustomConfigPageOutputPageResult {
+    pageNo: number;
+    pageSize: number;
+    pages: number;
+    total: number;
+    rows: CustomConfigPageOutput[] | undefined;
+
+    constructor(data?: ICustomConfigPageOutputPageResult) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.pageNo = _data["pageNo"];
+            this.pageSize = _data["pageSize"];
+            this.pages = _data["pages"];
+            this.total = _data["total"];
+            if (Array.isArray(_data["rows"])) {
+                this.rows = [] as any;
+                for (let item of _data["rows"])
+                    this.rows.push(CustomConfigPageOutput.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): CustomConfigPageOutputPageResult {
+        data = typeof data === 'object' ? data : {};
+        let result = new CustomConfigPageOutputPageResult();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["pageNo"] = this.pageNo;
+        data["pageSize"] = this.pageSize;
+        data["pages"] = this.pages;
+        data["total"] = this.total;
+        if (Array.isArray(this.rows)) {
+            data["rows"] = [];
+            for (let item of this.rows)
+                data["rows"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): CustomConfigPageOutputPageResult {
+        const json = this.toJSON();
+        let result = new CustomConfigPageOutputPageResult();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICustomConfigPageOutputPageResult {
+    pageNo: number;
+    pageSize: number;
+    pages: number;
+    total: number;
+    rows: CustomConfigPageOutput[] | undefined;
+}
+
+export class CustomConfigQueryInput implements ICustomConfigQueryInput {
+    pageNo: number;
+    pageSize: number;
+    /** 配置名称 */
+    name: string | undefined;
+    /** 配置唯一编码 */
+    code: string | undefined;
+
+    constructor(data?: ICustomConfigQueryInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.pageNo = _data["pageNo"];
+            this.pageSize = _data["pageSize"];
+            this.name = _data["name"];
+            this.code = _data["code"];
+        }
+    }
+
+    static fromJS(data: any): CustomConfigQueryInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new CustomConfigQueryInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["pageNo"] = this.pageNo;
+        data["pageSize"] = this.pageSize;
+        data["name"] = this.name;
+        data["code"] = this.code;
+        return data;
+    }
+
+    clone(): CustomConfigQueryInput {
+        const json = this.toJSON();
+        let result = new CustomConfigQueryInput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICustomConfigQueryInput {
+    pageNo: number;
+    pageSize: number;
+    /** 配置名称 */
+    name: string | undefined;
+    /** 配置唯一编码 */
+    code: string | undefined;
+}
+
+export class CustomConfigSetJsonInput implements ICustomConfigSetJsonInput {
+    /** 自定义配置ID */
+    id: string;
+    /** 表单设计 */
+    json: any;
+
+    constructor(data?: ICustomConfigSetJsonInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.json = _data["json"];
+        }
+    }
+
+    static fromJS(data: any): CustomConfigSetJsonInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new CustomConfigSetJsonInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["json"] = this.json;
+        return data;
+    }
+
+    clone(): CustomConfigSetJsonInput {
+        const json = this.toJSON();
+        let result = new CustomConfigSetJsonInput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICustomConfigSetJsonInput {
+    /** 自定义配置ID */
+    id: string;
+    /** 表单设计 */
+    json: any;
 }
 
 export class FriendLinkOutput implements IFriendLinkOutput {
@@ -10038,6 +10994,53 @@ export enum Gender {
     _0 = 0,
     _1 = 1,
     _2 = 2,
+}
+
+export class GetConfigDetailInput implements IGetConfigDetailInput {
+    id: string;
+    itemId: string | undefined;
+
+    constructor(data?: IGetConfigDetailInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.itemId = _data["itemId"];
+        }
+    }
+
+    static fromJS(data: any): GetConfigDetailInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetConfigDetailInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["itemId"] = this.itemId;
+        return data;
+    }
+
+    clone(): GetConfigDetailInput {
+        const json = this.toJSON();
+        let result = new GetConfigDetailInput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IGetConfigDetailInput {
+    id: string;
+    itemId: string | undefined;
 }
 
 export class KeyDto implements IKeyDto {
@@ -12712,6 +13715,85 @@ export interface IUpdateCurrentUserInput {
     mobile: string | undefined;
     /** 邮箱 */
     email: string | undefined;
+}
+
+export class UpdateCustomConfigInput implements IUpdateCustomConfigInput {
+    /** 配置名称 */
+    name: string;
+    /** 配置唯一编码（类名） */
+    code: string;
+    /** 是否是多项（集合） */
+    isMultiple: boolean;
+    /** 是否允许创建实体 */
+    allowCreationEntity: boolean;
+    status: AvailabilityStatus;
+    /** 备注 */
+    remark: string | undefined;
+    /** 配置id */
+    id: string;
+
+    constructor(data?: IUpdateCustomConfigInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.code = _data["code"];
+            this.isMultiple = _data["isMultiple"];
+            this.allowCreationEntity = _data["allowCreationEntity"];
+            this.status = _data["status"];
+            this.remark = _data["remark"];
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): UpdateCustomConfigInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateCustomConfigInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["code"] = this.code;
+        data["isMultiple"] = this.isMultiple;
+        data["allowCreationEntity"] = this.allowCreationEntity;
+        data["status"] = this.status;
+        data["remark"] = this.remark;
+        data["id"] = this.id;
+        return data;
+    }
+
+    clone(): UpdateCustomConfigInput {
+        const json = this.toJSON();
+        let result = new UpdateCustomConfigInput();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IUpdateCustomConfigInput {
+    /** 配置名称 */
+    name: string;
+    /** 配置唯一编码（类名） */
+    code: string;
+    /** 是否是多项（集合） */
+    isMultiple: boolean;
+    /** 是否允许创建实体 */
+    allowCreationEntity: boolean;
+    status: AvailabilityStatus;
+    /** 备注 */
+    remark: string | undefined;
+    /** 配置id */
+    id: string;
 }
 
 export class UpdateCustomConfigItemInput implements IUpdateCustomConfigItemInput {
