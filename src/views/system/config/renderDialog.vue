@@ -60,6 +60,8 @@ const onSubmit = async () => {
 				formData[item.options.name] = null;
 			}
 		});
+		console.log(state.itemId);
+
 		const { success } = state.itemId
 			? await _customConfigItemService.updateItem({
 					json: JSON.stringify(formData),
@@ -126,7 +128,7 @@ const openDialog = async (id: string, itemId?: string) => {
 	vfRenderRef.value?.setFormJson(state.formJson);
 	nextTick(() => {
 		// 绑定表单数据
-		vfRenderRef.value?.setFormData(state.formData);
+		vfRenderRef.value?.setFormData(JSON.parse(state.formData));
 	});
 	state.loading = false;
 };

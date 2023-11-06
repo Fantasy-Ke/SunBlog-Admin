@@ -51,7 +51,7 @@
 			</ProTable>
 		</div>
 		<!-- 用新增编辑 -->
-		<UserDialog ref="userDialogRef" @refresh="tableRef?.reset" />
+		<UserDialog ref="userDialogRef" @refresh="proTableRef?.reset" />
 		<!-- 密码重置 -->
 		<ResetDialog ref="resetDialogRef" />
 	</div>
@@ -75,7 +75,7 @@ const ResetDialog = defineAsyncComponent(() => import('@/views/system/user/reset
 const userDialogRef = ref<InstanceType<typeof UserDialog>>();
 const resetDialogRef = ref<InstanceType<typeof ResetDialog>>();
 //table实例
-const tableRef = ref<InstanceType<typeof ProTable>>();
+const proTableRef = ref<InstanceType<typeof ProTable>>();
 const orgTreeRef = ref<InstanceType<typeof TreeFilter>>();
 //机构数据
 const orgs = computed(() => (orgTreeRef.value?.treeData as any) ?? ([] as TreeSelectOutput[])); //orgTreeRef.value?.treeData ?? ([] as TreeSelectOutput[]);

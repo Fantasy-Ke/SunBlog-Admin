@@ -2,40 +2,19 @@
 	<div class="custom-config-item layout-padding">
 		<ProTable v-if="state.isShow" ref="tableRef" :columns="state.columns" :tool-button="false" :init-param="state.params" :request-api="getTableList">
 			<template #tools>
-				<el-button
-					v-auth="'customconfigitem:add|customconfigitem:edit|customconfigitem:delete|customconfigitem:page'"
-					type="primary"
-					icon="ele-Plus"
-					@click="onOpenRender('')"
-				>
-					新增
-				</el-button></template
+				<!-- v-auth="'customconfigitem:add|customconfigitem:edit|customconfigitem:delete|customconfigitem:page'" -->
+				<el-button type="primary" icon="ele-Plus" @click="onOpenRender('')"> 新增 </el-button></template
 			>
 			<template #__Status="scope">
 				<el-tag :type="scope.row.__Status === 0 ? 'success' : 'danger'"> {{ scope.row.__Status === 0 ? '启用' : '禁用' }}</el-tag>
 			</template>
 			<template #action="{ row }">
-				<el-button
-					v-auth="'customconfigitem:add|customconfigitem:edit|customconfigitem:delete|customconfigitem:page'"
-					icon="ele-Edit"
-					size="small"
-					text
-					type="primary"
-					@click="onOpenRender(row.__Id)"
-				>
-					编辑
-				</el-button>
+				<!-- v-auth="'customconfigitem:add|customconfigitem:edit|customconfigitem:delete|customconfigitem:page'" -->
+				<el-button icon="ele-Edit" size="small" text type="primary" @click="onOpenRender(row.__Id)"> 编辑 </el-button>
 				<el-popconfirm title="确认删除吗？" @confirm="onDeleteRole(row.__Id)">
 					<template #reference>
-						<el-button
-							v-auth="'customconfigitem:add|customconfigitem:edit|customconfigitem:delete|customconfigitem:page'"
-							icon="ele-Delete"
-							size="small"
-							text
-							type="danger"
-						>
-							删除
-						</el-button>
+						<!-- v-auth="'customconfigitem:add|customconfigitem:edit|customconfigitem:delete|customconfigitem:page'" -->
+						<el-button icon="ele-Delete" size="small" text type="danger"> 删除 </el-button>
 					</template>
 				</el-popconfirm>
 			</template>
