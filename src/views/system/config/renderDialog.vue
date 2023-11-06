@@ -13,10 +13,17 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, nextTick } from 'vue';
-import CustomConfigApi from '@/api/CustomConfigApi';
-import CustomConfigItemApi from '@/api/CustomConfigItemApi';
+import { reactive, ref, nextTick, inject } from 'vue';
 import { ElMessage } from 'element-plus';
+import {
+	AddCustomConfigItemInput,
+	CustomConfigItemsServiceProxy,
+	CustomConfigsServiceProxy,
+	GetConfigDetailInput,
+	UpdateCustomConfigItemInput,
+} from '@/shared/service-proxies';
+const _customConfigService = new CustomConfigsServiceProxy(inject('$baseurl'), inject('$api'));
+const _customConfigItemService = new CustomConfigItemsServiceProxy(inject('$baseurl'), inject('$api'));
 // 定义子组件向父组件传值/事件
 const emit = defineEmits(['refresh']);
 // 表单渲染控件实例
@@ -24,8 +31,8 @@ const vfRenderRef = ref();
 const state = reactive({
 	formJson: {}, //表单渲染的json
 	formData: {} as any, //表单数据绑定
-	id: 0,
-	itemId: 0,
+	id: '',
+	itemId: '',
 	loading: false,
 	isShowDialog: false,
 	regex: /{"key":\d+,"type":"(file-upload|picture-upload)".*?"id".*?}/g, //匹配出json中的图片上传控件和附件上传控件
@@ -53,48 +60,45 @@ const onSubmit = async () => {
 				formData[item.options.name] = null;
 			}
 		});
-		debugger;
-		const { succeeded, errors } =
-			state.itemId === 0
-				? await CustomConfigItemApi.add({ json: JSON.stringify(formData), configId: state.id })
-				: await CustomConfigItemApi.edit({
-						json: JSON.stringify(formData),
-						configId: state.id,
-						id: state.itemId,
-				  });
-		if (succeeded) {
+		const { success } = state.itemId
+			? await _customConfigItemService.updateItem({
+					json: JSON.stringify(formData),
+					configId: state.id,
+					id: state.itemId,
+			  } as UpdateCustomConfigItemInput)
+			: await _customConfigItemService.addItem({ json: JSON.stringify(formData), configId: state.id } as AddCustomConfigItemInput);
+		if (success) {
 			ElMessage.success('保存成功');
 			state.isShowDialog = false;
 			emit('refresh');
 			return;
 		}
-		ElMessage.error(errors);
 	} catch (e: any) {
 		ElMessage.error(e);
 	}
 };
 // 打开弹窗
 state.formJson = {};
-const openDialog = async (id: number, itemId?: number) => {
+const openDialog = async (id: string, itemId?: string) => {
 	vfRenderRef.value?.resetForm();
 	state.id = id;
 	state.isShowDialog = true;
 	state.loading = true;
-	const { data, succeeded, errors } = await CustomConfigApi.getJson(id, itemId);
-	if (!succeeded) {
-		ElMessage.error(errors);
+	const { result, success, error } = await _customConfigService.getFormJson({ id: id, itemId: itemId } as GetConfigDetailInput);
+	if (!success) {
+		ElMessage.error(error.message);
 		state.isShowDialog = false;
 		return;
 	}
-	state.itemId = data?.itemId ?? 0;
-	state.formJson = data!.formJson!;
-	const json = JSON.stringify(data!.formJson);
+	state.itemId = result?.itemId ?? '';
+	state.formJson = result!.formJson!;
+	const json = JSON.stringify(result!.formJson);
 	const jsonString = json.match(state.regex)?.join(',');
-	state.formData = data!.dataJson ?? {};
+	state.formData = result!.dataJson ?? {};
 	if (jsonString) {
 		state.fileOptions = JSON.parse(`[${jsonString}]`);
 	}
-	if (data!.dataJson && state.fileOptions.length > 0) {
+	if (result!.dataJson && state.fileOptions.length > 0) {
 		//处理上传的附件和图片数据格式
 		state.fileOptions.forEach((item: any) => {
 			const field = state.formData[item.options.name];

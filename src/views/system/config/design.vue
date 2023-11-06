@@ -13,13 +13,15 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { inject, onMounted } from 'vue';
 import { reactive } from 'vue';
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
-import CustomConfigApi from '@/api/CustomConfigApi';
 import { ElMessage } from 'element-plus';
 import miitBus from '@/utils/mitt';
+import { CustomConfigSetJsonInput, CustomConfigsServiceProxy, GetConfigDetailInput } from '@/shared/service-proxies';
+
+const _customConfigService = new CustomConfigsServiceProxy(inject('$baseurl'), inject('$api'));
 //路由
 const route = useRoute();
 //表单设计实例
@@ -28,7 +30,7 @@ const vfDesgemRef = ref();
 //表单数据
 const vm = reactive({
 	formJson: {},
-	id: 0,
+	id: '',
 	loading: true,
 });
 
@@ -44,13 +46,13 @@ const saveFormJson = async () => {
 	json = json.replace(/"uploadURL":""/g, '"uploadURL":"/api/file/upload"').replace(/"withCredentials":false/g, '"withCredentials":true');
 	formJson = JSON.parse(json);
 	vm.loading = true;
-	const { succeeded, errors } = await CustomConfigApi.setJson({ id: vm.id, json: formJson });
+	const { success, error } = await _customConfigService.setJson({ id: vm.id, json: formJson } as CustomConfigSetJsonInput);
 	vm.loading = false;
-	if (succeeded) {
+	if (success) {
 		ElMessage.success('保存成功');
 		miitBus.emit('onCurrentContextmenuClick', Object.assign({}, { contextMenuClickId: 1, ...route }));
 	} else {
-		ElMessage.error(errors);
+		ElMessage.error(error.message);
 	}
 };
 
@@ -59,10 +61,10 @@ onMounted(async () => {
 	const id = route.query.id as unknown;
 	vfDesgemRef.value?.clearDesigner();
 	if (id !== undefined) {
-		vm.id = id as number;
-		const { data, succeeded } = await CustomConfigApi.getJson(vm.id);
-		if (succeeded) {
-			vm.formJson = data!.formJson!;
+		vm.id = id as string;
+		const { result, success } = await _customConfigService.getFormJson({ id: vm.id } as GetConfigDetailInput);
+		if (success) {
+			vm.formJson = result!.formJson!;
 			vfDesgemRef.value?.setFormJson(vm.formJson);
 		}
 	}

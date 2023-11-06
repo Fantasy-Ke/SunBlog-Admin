@@ -66,9 +66,9 @@
 
 <script setup lang="ts" name="systemRoleDialog">
 import { ElMessage, FormInstance, FormRules } from 'element-plus';
-import { reactive, ref, nextTick } from 'vue';
-import { UpdateCustomConfigInput } from '@/api/models';
-import CustomConfigApi from '@/api/CustomConfigApi';
+import { reactive, ref, nextTick, inject } from 'vue';
+import { CustomConfigsServiceProxy, UpdateCustomConfigInput } from '@/shared/service-proxies';
+const _customConfigService = new CustomConfigsServiceProxy(inject('$baseurl'), inject('$api'));
 
 // 定义子组件向父组件传值/事件
 const emit = defineEmits(['refresh']);
@@ -124,11 +124,11 @@ const openDialog = async (row: UpdateCustomConfigInput | null, isGenerate: boole
 	state.isGenerate = isGenerate;
 	state.dialog.loading = true;
 	if (row != null) {
-		state.ruleForm = { ...row };
+		state.ruleForm = { ...row } as UpdateCustomConfigInput;
 		state.dialog.title = '修改配置';
 		state.dialog.submitTxt = '修 改';
 	} else {
-		state.ruleForm.id = 0;
+		state.ruleForm.id = '';
 		state.dialog.title = '新增配置';
 		state.dialog.submitTxt = '新 增';
 		// 重置表单
@@ -150,8 +150,10 @@ const onCancel = () => {
 const onSubmit = async () => {
 	configDialogFormRef.value?.validate(async (v) => {
 		if (v) {
-			const { succeeded } = state.ruleForm.id === 0 ? await CustomConfigApi.add(state.ruleForm) : await CustomConfigApi.edit(state.ruleForm);
-			if (succeeded) {
+			const { success } = state.ruleForm.id
+				? await _customConfigService.updateConfig(state.ruleForm)
+				: await _customConfigService.addConfig(state.ruleForm);
+			if (success) {
 				ElMessage.success('保存成功');
 				closeDialog();
 				emit('refresh');

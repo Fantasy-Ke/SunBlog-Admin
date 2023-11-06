@@ -1,8 +1,9 @@
 <template>
 	<div class="system-config-container layout-padding">
-		<ProTable ref="tableRef" :request-api="CustomConfigApi.page" :columns="columns" :tool-button="false">
+		<ProTable ref="tableRef" :request-api="getTableList" :columns="columns" :tool-button="false">
 			<template #tools>
-				<el-button v-auth="'customconfig:add'" type="primary" icon="ele-Plus" @click="onOpenConfig(null)"> 新增 </el-button></template
+				<!-- v-auth="'customconfig:add'" -->
+				<el-button type="primary" icon="ele-Plus" @click="onOpenConfig(null)"> 新增 </el-button></template
 			>
 			<template #status="scope">
 				<el-tag :type="scope.row.status === 0 ? 'success' : 'danger'"> {{ scope.row.status === 0 ? '启用' : '禁用' }}</el-tag>
@@ -11,39 +12,31 @@
 				{{ row.isMultiple ? '多项' : '单项' }}
 			</template>
 			<template #action="{ row }">
-				<el-button v-auth="'customconfig:edit'" icon="ele-Edit" size="small" text type="primary" @click="onOpenConfig(row)"> 编辑 </el-button>
+				<!-- v-auth="'customconfig:edit'" -->
+				<el-button icon="ele-Edit" size="small" text type="primary" @click="onOpenConfig(row)"> 编辑 </el-button>
 				<el-dropdown>
 					<el-button icon="ele-MoreFilled" size="small" text type="primary" style="padding-left: 12px" />
 					<template #dropdown>
 						<el-dropdown-menu>
-							<el-dropdown-item
-								v-if="auth('customconfigitem:add|customconfigitem:edit|customconfigitem:delete|customconfigitem:page')"
-								icon="ele-List"
-								@click="onConfigItem(row)"
-							>
-								配置项
-							</el-dropdown-item>
-							<el-dropdown-item icon="ele-BrushFilled" v-if="auth('customconfig:setjson')" @click="onDesign(row.id)" divided>
-								配置设计 </el-dropdown-item
-							><el-dropdown-item
-								icon="ele-Document"
-								divided
-								@click="onGenerate(row.id)"
-								v-if="isAllowGenerateOrDelete(row.allowCreationEntity) && auth('customconfig:generate')"
-							>
+							<!-- v-if="auth('customconfigitem:add|customconfigitem:edit|customconfigitem:delete|customconfigitem:page')" -->
+							<el-dropdown-item icon="ele-List" @click="onConfigItem(row)"> 配置项 </el-dropdown-item>
+							<!-- v-if="auth('customconfig:setjson')" -->
+							<el-dropdown-item icon="ele-BrushFilled" @click="onDesign(row.id)" divided> 配置设计 </el-dropdown-item>
+							<!-- && auth('customconfig:generate') -->
+							<el-dropdown-item icon="ele-Document" divided @click="onGenerate(row.id)" v-if="isAllowGenerateOrDelete(row.allowCreationEntity)">
 								生成实体
 							</el-dropdown-item>
+							<!-- && auth('customconfig:deleteClass') -->
 							<el-dropdown-item
 								icon="ele-Delete"
-								v-if="isAllowGenerateOrDelete(row.allowCreationEntity) && row.isGenerate && auth('customconfig:deleteClass')"
+								v-if="isAllowGenerateOrDelete(row.allowCreationEntity) && row.isGenerate"
 								divided
 								@click="onDeleteConfigClass(row)"
 							>
 								删除实体
 							</el-dropdown-item>
-							<el-dropdown-item icon="ele-Delete" v-if="auth('customconfig:delete')" divided @click="onDeleteConfig(row)">
-								删除配置
-							</el-dropdown-item>
+							<!-- v-if="auth('customconfig:delete')" -->
+							<el-dropdown-item icon="ele-Delete" divided @click="onDeleteConfig(row)"> 删除配置 </el-dropdown-item>
 						</el-dropdown-menu>
 					</template>
 				</el-dropdown>
@@ -55,14 +48,13 @@
 </template>
 
 <script setup lang="ts" name="customConfig">
-import { defineAsyncComponent, reactive, ref } from 'vue';
+import { defineAsyncComponent, inject, reactive, ref } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { useRouter } from 'vue-router';
 import ProTable from '@/components/ProTable/index.vue';
-import CustomConfigApi from '@/api/CustomConfigApi';
-import type { CustomConfigPageOutput } from '@/api/models';
 import type { ColumnProps } from '@/components/ProTable/interface';
-import { auths, auth } from '@/utils/authFunction';
+import { CustomConfigPageOutput, CustomConfigsServiceProxy, KeyDto } from '@/shared/service-proxies';
+const _customConfigService = new CustomConfigsServiceProxy(inject('$baseurl'), inject('$api'));
 
 // 引入组件
 const ConfigDialog = defineAsyncComponent(() => import('./configDialog.vue'));
@@ -111,12 +103,16 @@ const columns = reactive<ColumnProps[]>([
 		prop: 'action',
 		label: '操作',
 		width: 150,
-		isShow: auths(['customconfig:edit', 'customconfig:delete']),
+		//isShow: auths(['customconfig:edit', 'customconfig:delete']),
 	},
 ]);
 // 打开新增/编辑配置弹窗
 const onOpenConfig = (row: any) => {
 	configDialogRef.value?.openDialog(row, row?.isGenerate ?? false);
+};
+
+const getTableList = (params: any) => {
+	return _customConfigService.getPage(params);
 };
 
 // 配置表单设计
@@ -134,13 +130,13 @@ const onConfigItem = async (row: CustomConfigPageOutput) => {
 };
 
 // 生成配置类
-const onGenerate = async (id: number) => {
-	const { succeeded, errors } = await CustomConfigApi.generate(id);
-	if (succeeded) {
+const onGenerate = async (id: string) => {
+	const { success, error } = await _customConfigService.generate({ id: id } as KeyDto);
+	if (success) {
 		tableRef.value?.reset();
 		ElMessage.success('生成成功');
 	} else {
-		ElMessage.error(errors);
+		ElMessage.error(error.message);
 	}
 };
 
@@ -152,8 +148,8 @@ const onDeleteConfig = async (row: CustomConfigPageOutput) => {
 		type: 'warning',
 	})
 		.then(async () => {
-			const { succeeded } = await CustomConfigApi.delete({ id: row.id });
-			if (succeeded) {
+			const { success } = await _customConfigService.delete(row.id);
+			if (success) {
 				ElMessage.success('删除成功');
 				tableRef.value?.reset();
 			}
@@ -169,8 +165,8 @@ const onDeleteConfigClass = async (row: CustomConfigPageOutput) => {
 		type: 'warning',
 	})
 		.then(async () => {
-			const { succeeded } = await CustomConfigApi.deleteClass(row.id!);
-			if (succeeded) {
+			const { success } = await _customConfigService.deleteClass({ id: row.id } as KeyDto);
+			if (success) {
 				ElMessage.success('删除成功');
 				tableRef.value?.reset();
 			}

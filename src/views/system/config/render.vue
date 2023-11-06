@@ -8,11 +8,12 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue';
+import { inject, onMounted, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import CustomConfigApi from '@/api/CustomConfigApi';
 import { ElMessage } from 'element-plus';
 import miitBus from '@/utils/mitt';
+import { CustomConfigsServiceProxy, GetConfigDetailInput } from '@/shared/service-proxies';
+const _customConfigService = new CustomConfigsServiceProxy(inject('$baseurl'), inject('$api'));
 //路由
 const route = useRoute();
 const vfRenderRef = ref();
@@ -32,9 +33,9 @@ onMounted(async () => {
 	vm.loading = true;
 	const id = route.query.id as unknown;
 	if (id !== undefined) {
-		const { data } = await CustomConfigApi.getJson(id as number);
-		if (data) {
-			vm.formJson = data.formJson ?? {};
+		const { result } = await _customConfigService.getFormJson({ id: id as string } as GetConfigDetailInput);
+		if (result) {
+			vm.formJson = result.formJson ?? {};
 			vfRenderRef.value?.setFormJson(vm.formJson);
 		} else {
 			ElMessage.error('请先配置设计');

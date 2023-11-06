@@ -1,19 +1,12 @@
 <template>
 	<div class="custom-config-item layout-padding">
-		<ProTable
-			v-if="state.isShow"
-			ref="tableRef"
-			:columns="state.columns"
-			:tool-button="false"
-			:init-param="state.params"
-			:request-api="CustomConfigItemApi.page"
-		>
+		<ProTable v-if="state.isShow" ref="tableRef" :columns="state.columns" :tool-button="false" :init-param="state.params" :request-api="getTableList">
 			<template #tools>
 				<el-button
 					v-auth="'customconfigitem:add|customconfigitem:edit|customconfigitem:delete|customconfigitem:page'"
 					type="primary"
 					icon="ele-Plus"
-					@click="onOpenRender(0)"
+					@click="onOpenRender('')"
 				>
 					新增
 				</el-button></template
@@ -52,13 +45,14 @@
 </template>
 
 <script setup lang="tsx" name="customItemList">
-import { ref, reactive, onMounted, nextTick, defineAsyncComponent } from 'vue';
+import { ref, reactive, onMounted, nextTick, defineAsyncComponent, inject } from 'vue';
 import { useRoute } from 'vue-router';
 import ProTable from '@/components/ProTable/index.vue';
-import CustomConfigApi from '@/api/CustomConfigApi';
-import CustomConfigItemApi from '@/api/CustomConfigItemApi';
 import type { ColumnProps } from '@/components/ProTable/interface';
 import { ElMessage } from 'element-plus';
+import { CustomConfigItemsServiceProxy, CustomConfigsServiceProxy, GetConfigDetailInput } from '@/shared/service-proxies';
+const _customConfigService = new CustomConfigsServiceProxy(inject('$baseurl'), inject('$api'));
+const _customConfigItemService = new CustomConfigItemsServiceProxy(inject('$baseurl'), inject('$api'));
 const route = useRoute();
 // 引入组件
 const RenderDialog = defineAsyncComponent(() => import('./renderDialog.vue'));
@@ -83,24 +77,28 @@ const state = reactive({
 });
 
 // 打开新增、编辑弹窗
-const onOpenRender = async (itemId?: number) => {
+const onOpenRender = async (itemId?: string) => {
 	await renderDialogRef.value?.openDialog(route.query.id as never, itemId);
 };
 
+const getTableList = (params: any) => {
+	return _customConfigItemService.getPage(params);
+};
+
 // 删除
-const onDeleteRole = async (id: number) => {
-	const { succeeded, errors } = await CustomConfigItemApi.delete({ id });
-	if (succeeded) {
+const onDeleteRole = async (id: string) => {
+	const { success, error } = await _customConfigItemService.delete(id);
+	if (success) {
 		ElMessage.success('删除成功');
 		tableRef.value?.reset();
 	} else {
-		ElMessage.error(errors);
+		ElMessage.error(error.message);
 	}
 };
 
 onMounted(async () => {
-	const { data } = await CustomConfigApi.getJson(route.query.id as never);
-	const json = JSON.stringify(data!.formJson);
+	const { result } = await _customConfigService.getFormJson({ id: route.query.id } as GetConfigDetailInput);
+	const json = JSON.stringify(result!.formJson);
 	const reg =
 		/{"key":\d+,"type":"(input|select|date|switch|number|textarea|radio|checkbox|time|time-range|date-range|rate|color|slider|cascader|rich-editor|file-upload|picture-upload)".*?"id".*?}/g;
 	const optionSting = json.match(reg)?.join(',');
