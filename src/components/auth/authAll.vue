@@ -18,10 +18,10 @@ const props = defineProps({
 
 // 定义变量内容
 const stores = useUserInfo();
-const { userInfos } = storeToRefs(stores);
+const { userInfo } = storeToRefs(stores);
 
 // 获取 pinia 中的用户权限
 const getUserAuthBtnList = computed(() => {
-	return judementSameArr(props.value, userInfos.value.authBtnList);
+	return judementSameArr(props.value, userInfo.value.authBtnList);
 });
 </script>

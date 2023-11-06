@@ -17,10 +17,10 @@ const props = defineProps({
 
 // 定义变量内容
 const stores = useUserInfo();
-const { userInfos } = storeToRefs(stores);
+const { userInfo } = storeToRefs(stores);
 
 // 获取 pinia 中的用户权限
 const getUserAuthBtnList = computed(() => {
-	return userInfos.value.authBtnList.some((v: string) => v === props.value);
+	return userInfo.value.authBtnList.some((v: string) => v === props.value);
 });
 </script>
