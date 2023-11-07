@@ -18,7 +18,6 @@
 			</template>
 			<template #action="{ row }">
 				<!-- v-auth="'customconfigitem:add|customconfigitem:edit|customconfigitem:delete|customconfigitem:page'" -->
-				{{ row['tempId'] }}{{ 555 }}
 				<el-button icon="ele-Edit" size="small" text type="primary" @click="onOpenRender(row.tempId)"> 编辑 </el-button>
 				<el-popconfirm title="确认删除吗？" @confirm="onDeleteRole(row.tempId)">
 					<template #reference>

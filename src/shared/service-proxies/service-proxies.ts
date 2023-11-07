@@ -4225,7 +4225,7 @@ export class CustomConfigItemsServiceProxy {
      * @param body (optional) 
      * @return Success
      */
-    getPage(body: CustomConfigItemQueryInput | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<ObjectPageResult>> {
+    getPage(body: CustomConfigItemQueryInput | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<StringPageResult>> {
         let url_ = this.baseUrl + "/api/CustomConfigItems/GetPage";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -4253,7 +4253,7 @@ export class CustomConfigItemsServiceProxy {
         });
     }
 
-    protected processGetPage(response: AxiosResponse): Promise<ZEngineResponse<ObjectPageResult>> {
+    protected processGetPage(response: AxiosResponse): Promise<ZEngineResponse<StringPageResult>> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -4268,16 +4268,16 @@ export class CustomConfigItemsServiceProxy {
             let result200: any = null;
             let result200Data: any = null;
             let resultData200  = _responseText.result;
-            result200 = ObjectPageResult.fromJS(resultData200);
+            result200 = StringPageResult.fromJS(resultData200);
             result200Data = ZEngineResponse.fromJS(_responseText);
             result200Data.result = result200;
-            return Promise.resolve<ZEngineResponse<ObjectPageResult>>(result200Data);
+            return Promise.resolve<ZEngineResponse<StringPageResult>>(result200Data);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<ZEngineResponse<ObjectPageResult>>(null as any);
+        return Promise.resolve<ZEngineResponse<StringPageResult>>(null as any);
     }
 
     /**
@@ -10450,6 +10450,8 @@ export class CustomConfigPageOutput implements ICustomConfigPageOutput {
     isMultiple: boolean;
     /** 是否允许创建实体 */
     allowCreationEntity: boolean;
+    /** 配置id */
+    configItemId: string[] | undefined;
     /** 是否已生成实体 */
     isGenerate: boolean;
     /** 创建时间 */
@@ -10473,6 +10475,11 @@ export class CustomConfigPageOutput implements ICustomConfigPageOutput {
             this.code = _data["code"];
             this.isMultiple = _data["isMultiple"];
             this.allowCreationEntity = _data["allowCreationEntity"];
+            if (Array.isArray(_data["configItemId"])) {
+                this.configItemId = [] as any;
+                for (let item of _data["configItemId"])
+                    this.configItemId.push(item);
+            }
             this.isGenerate = _data["isGenerate"];
             this.createdTime = _data["createdTime"] ? moment(_data["createdTime"].toString()) : <any>undefined;
         }
@@ -10494,6 +10501,11 @@ export class CustomConfigPageOutput implements ICustomConfigPageOutput {
         data["code"] = this.code;
         data["isMultiple"] = this.isMultiple;
         data["allowCreationEntity"] = this.allowCreationEntity;
+        if (Array.isArray(this.configItemId)) {
+            data["configItemId"] = [];
+            for (let item of this.configItemId)
+                data["configItemId"].push(item);
+        }
         data["isGenerate"] = this.isGenerate;
         data["createdTime"] = this.createdTime ? this.createdTime.toISOString() : <any>undefined;
         return data;
@@ -10521,6 +10533,8 @@ export interface ICustomConfigPageOutput {
     isMultiple: boolean;
     /** 是否允许创建实体 */
     allowCreationEntity: boolean;
+    /** 配置id */
+    configItemId: string[] | undefined;
     /** 是否已生成实体 */
     isGenerate: boolean;
     /** 创建时间 */
@@ -11578,73 +11592,6 @@ export interface IOAuthAccountDetailOutput {
     remark: string | undefined;
 }
 
-export class ObjectPageResult implements IObjectPageResult {
-    pageNo: number;
-    pageSize: number;
-    pages: number;
-    total: number;
-    rows: any[] | undefined;
-
-    constructor(data?: IObjectPageResult) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.pageNo = _data["pageNo"];
-            this.pageSize = _data["pageSize"];
-            this.pages = _data["pages"];
-            this.total = _data["total"];
-            if (Array.isArray(_data["rows"])) {
-                this.rows = [] as any;
-                for (let item of _data["rows"])
-                    this.rows.push(item);
-            }
-        }
-    }
-
-    static fromJS(data: any): ObjectPageResult {
-        data = typeof data === 'object' ? data : {};
-        let result = new ObjectPageResult();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["pageNo"] = this.pageNo;
-        data["pageSize"] = this.pageSize;
-        data["pages"] = this.pages;
-        data["total"] = this.total;
-        if (Array.isArray(this.rows)) {
-            data["rows"] = [];
-            for (let item of this.rows)
-                data["rows"].push(item);
-        }
-        return data;
-    }
-
-    clone(): ObjectPageResult {
-        const json = this.toJSON();
-        let result = new ObjectPageResult();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IObjectPageResult {
-    pageNo: number;
-    pageSize: number;
-    pages: number;
-    total: number;
-    rows: any[] | undefined;
-}
-
 export class Pagination implements IPagination {
     pageNo: number;
     pageSize: number;
@@ -12691,6 +12638,73 @@ export class SelectOutput implements ISelectOutput {
 export interface ISelectOutput {
     label: string | undefined;
     value: any | undefined;
+}
+
+export class StringPageResult implements IStringPageResult {
+    pageNo: number;
+    pageSize: number;
+    pages: number;
+    total: number;
+    rows: string[] | undefined;
+
+    constructor(data?: IStringPageResult) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.pageNo = _data["pageNo"];
+            this.pageSize = _data["pageSize"];
+            this.pages = _data["pages"];
+            this.total = _data["total"];
+            if (Array.isArray(_data["rows"])) {
+                this.rows = [] as any;
+                for (let item of _data["rows"])
+                    this.rows.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): StringPageResult {
+        data = typeof data === 'object' ? data : {};
+        let result = new StringPageResult();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["pageNo"] = this.pageNo;
+        data["pageSize"] = this.pageSize;
+        data["pages"] = this.pages;
+        data["total"] = this.total;
+        if (Array.isArray(this.rows)) {
+            data["rows"] = [];
+            for (let item of this.rows)
+                data["rows"].push(item);
+        }
+        return data;
+    }
+
+    clone(): StringPageResult {
+        const json = this.toJSON();
+        let result = new StringPageResult();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IStringPageResult {
+    pageNo: number;
+    pageSize: number;
+    pages: number;
+    total: number;
+    rows: string[] | undefined;
 }
 
 export class SysOrgPageOutput implements ISysOrgPageOutput {

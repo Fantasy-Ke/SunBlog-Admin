@@ -100,6 +100,8 @@ const openDialog = async (id: string, itemId?: string) => {
 	if (jsonString) {
 		state.fileOptions = JSON.parse(`[${jsonString}]`);
 	}
+	console.log(result!.dataJson, state.fileOptions);
+
 	if (result!.dataJson && state.fileOptions.length > 0) {
 		//处理上传的附件和图片数据格式
 		state.fileOptions.forEach((item: any) => {
@@ -127,8 +129,11 @@ const openDialog = async (id: string, itemId?: string) => {
 	// 渲染表单
 	vfRenderRef.value?.setFormJson(state.formJson);
 	nextTick(() => {
+		let c = state.formData ? JSON.parse(state.formData) : {};
+		console.log(c);
+
 		// 绑定表单数据
-		vfRenderRef.value?.setFormData(state.formData ? JSON.parse(state.formData) : {});
+		vfRenderRef.value?.setFormData(c);
 	});
 	state.loading = false;
 };

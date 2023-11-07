@@ -125,7 +125,7 @@ const onConfigItem = async (row: CustomConfigPageOutput) => {
 	if (row.isMultiple) {
 		router.push({ path: '/system/config/items', query: { id: row.id } });
 	} else {
-		await renderDialogRef.value?.openDialog(row.id!);
+		await renderDialogRef.value?.openDialog(row.id!, row.configItemId ? row.configItemId[0] : '');
 	}
 };
 
