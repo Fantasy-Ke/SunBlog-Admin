@@ -1,17 +1,26 @@
 <template>
 	<div class="custom-config-item layout-padding">
-		<ProTable v-if="state.isShow" ref="tableRef" :columns="state.columns" :tool-button="false" :init-param="state.params" :request-api="getTableList">
+		<ProTable
+			v-if="state.isShow"
+			ref="tableRef"
+			:columns="state.columns"
+			:tool-button="false"
+			:init-param="state.params"
+			:data-call-back="dataCallBack"
+			:request-api="getTableList"
+		>
 			<template #tools>
 				<!-- v-auth="'customconfigitem:add|customconfigitem:edit|customconfigitem:delete|customconfigitem:page'" -->
 				<el-button type="primary" icon="ele-Plus" @click="onOpenRender('')"> 新增 </el-button></template
 			>
-			<template #__Status="scope">
-				<el-tag :type="scope.row.__Status === 0 ? 'success' : 'danger'"> {{ scope.row.__Status === 0 ? '启用' : '禁用' }}</el-tag>
+			<template #tempStatus="scope">
+				<el-tag :type="scope.row.tempStatus === 0 ? 'success' : 'danger'"> {{ scope.row.tempStatus === 0 ? '启用' : '禁用' }}</el-tag>
 			</template>
 			<template #action="{ row }">
 				<!-- v-auth="'customconfigitem:add|customconfigitem:edit|customconfigitem:delete|customconfigitem:page'" -->
-				<el-button icon="ele-Edit" size="small" text type="primary" @click="onOpenRender(row.__Id)"> 编辑 </el-button>
-				<el-popconfirm title="确认删除吗？" @confirm="onDeleteRole(row.__Id)">
+				{{ row['tempId'] }}{{ 555 }}
+				<el-button icon="ele-Edit" size="small" text type="primary" @click="onOpenRender(row.tempId)"> 编辑 </el-button>
+				<el-popconfirm title="确认删除吗？" @confirm="onDeleteRole(row.tempId)">
 					<template #reference>
 						<!-- v-auth="'customconfigitem:add|customconfigitem:edit|customconfigitem:delete|customconfigitem:page'" -->
 						<el-button icon="ele-Delete" size="small" text type="danger"> 删除 </el-button>
@@ -54,6 +63,12 @@ const state = reactive({
 	isShow: false,
 	params: { id: route.query.id as never as number },
 });
+
+const dataCallBack = (result) => {
+	let row = [];
+	result.rows.forEach((res) => row.push(JSON.parse(res)));
+	result.rows = row;
+};
 
 // 打开新增、编辑弹窗
 const onOpenRender = async (itemId?: string) => {
@@ -124,11 +139,11 @@ onMounted(async () => {
 	}
 	state.columns.push(
 		...[
-			{ label: '状态', prop: '__Status', width: 80 },
+			{ label: '状态', prop: 'tempStatus', width: 80 },
 			{
 				width: 160,
 				label: '创建时间',
-				prop: '__CreatedTime',
+				prop: 'tempCreatedTime',
 			},
 			{
 				prop: 'action',

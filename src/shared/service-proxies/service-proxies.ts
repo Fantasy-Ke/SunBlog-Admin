@@ -10332,7 +10332,7 @@ export class CustomConfigDetailOutput implements ICustomConfigDetailOutput {
     /** 表单数据 */
     dataJson: string | undefined;
     /** 配置项Id */
-    itemId: string;
+    itemId: string | undefined;
 
     constructor(data?: ICustomConfigDetailOutput) {
         if (data) {
@@ -10380,7 +10380,7 @@ export interface ICustomConfigDetailOutput {
     /** 表单数据 */
     dataJson: string | undefined;
     /** 配置项Id */
-    itemId: string;
+    itemId: string | undefined;
 }
 
 export class CustomConfigItemQueryInput implements ICustomConfigItemQueryInput {

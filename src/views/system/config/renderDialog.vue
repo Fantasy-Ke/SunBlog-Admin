@@ -128,7 +128,7 @@ const openDialog = async (id: string, itemId?: string) => {
 	vfRenderRef.value?.setFormJson(state.formJson);
 	nextTick(() => {
 		// 绑定表单数据
-		vfRenderRef.value?.setFormData(JSON.parse(state.formData));
+		vfRenderRef.value?.setFormData(state.formData ? JSON.parse(state.formData) : {});
 	});
 	state.loading = false;
 };
