@@ -10,65 +10,65 @@
 
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, CancelToken } from 'axios';
 
-import  moment from 'moment';
+import moment from 'moment';
 
-class ErrorInfo{
-    message:any
-    init(_data?: any) {
-      if (_data) {
-          this.message = _data["message"];
-      }
-  }
-  
-  static fromJS(data: any): ErrorInfo {
-      data = typeof data === 'object' ? data : {};
-      let result = new ErrorInfo();
-      result.init(data);
-      return result;
-  }
-  
-  toJSON(data?: any) {
-      data = typeof data === 'object' ? data : {};
-      data["message"] = this.message;
-      return data;
-  }
+class ErrorInfo {
+	message: any;
+	init(_data?: any) {
+		if (_data) {
+			this.message = _data['message'];
+		}
+	}
+
+	static fromJS(data: any): ErrorInfo {
+		data = typeof data === 'object' ? data : {};
+		let result = new ErrorInfo();
+		result.init(data);
+		return result;
+	}
+
+	toJSON(data?: any) {
+		data = typeof data === 'object' ? data : {};
+		data['message'] = this.message;
+		return data;
+	}
 }
-class ZResponseBase{
-    statusCode: number;
-    error: ErrorInfo;
-    unAuthorizedRequest: boolean;
-    extras: any;
-    success:boolean;
-  
-    init(_data?: any) {
-      if (_data) {
-          this.statusCode = _data["statusCode"];
-          this.error = ErrorInfo.fromJS(_data["error"]);
-          this.unAuthorizedRequest = _data["unAuthorizedRequest"];
-          this.extras = _data["extras"];
-          this.success = _data["success"];
-      }
-  }
-  
-  static fromJS(data: any): ZResponseBase {
-      data = typeof data === 'object' ? data : {};
-      let result = new ZResponseBase();
-      result.init(data);
-      return result;
-  }
-  
-  toJSON(data?: any) {
-      data = typeof data === 'object' ? data : {};
-      data["statusCode"] = this.statusCode;
-      data["error"] = this.error;
-      data["unAuthorizedRequest"] = this.unAuthorizedRequest;
-      data["extras"] = this.extras;
-      data["success"] = this.success;
-      return data;
-  }
+class ZResponseBase {
+	statusCode: number;
+	error: ErrorInfo;
+	unAuthorizedRequest: boolean;
+	extras: any;
+	success: boolean;
+
+	init(_data?: any) {
+		if (_data) {
+			this.statusCode = _data['statusCode'];
+			this.error = ErrorInfo.fromJS(_data['error']);
+			this.unAuthorizedRequest = _data['unAuthorizedRequest'];
+			this.extras = _data['extras'];
+			this.success = _data['success'];
+		}
+	}
+
+	static fromJS(data: any): ZResponseBase {
+		data = typeof data === 'object' ? data : {};
+		let result = new ZResponseBase();
+		result.init(data);
+		return result;
+	}
+
+	toJSON(data?: any) {
+		data = typeof data === 'object' ? data : {};
+		data['statusCode'] = this.statusCode;
+		data['error'] = this.error;
+		data['unAuthorizedRequest'] = this.unAuthorizedRequest;
+		data['extras'] = this.extras;
+		data['success'] = this.success;
+		return data;
+	}
 }
-class ZEngineResponse<T = any> extends ZResponseBase{
-    result: T;
+export class ZEngineResponse<T = any> extends ZResponseBase {
+	result: T;
 }
 
 
@@ -9095,7 +9095,8 @@ export enum AvailabilityStatus {
 }
 
 export class BloggerInfo implements IBloggerInfo {
-    avatar: string | undefined;
+    avatar: any[] | undefined;
+    avatarUrl: string | undefined;
     nikeName: string | undefined;
     qq: string | undefined;
     github: string | undefined;
@@ -9114,7 +9115,12 @@ export class BloggerInfo implements IBloggerInfo {
 
     init(_data?: any) {
         if (_data) {
-            this.avatar = _data["avatar"];
+            if (Array.isArray(_data["avatar"])) {
+                this.avatar = [] as any;
+                for (let item of _data["avatar"])
+                    this.avatar.push(item);
+            }
+            this.avatarUrl = _data["avatarUrl"];
             this.nikeName = _data["nikeName"];
             this.qq = _data["qq"];
             this.github = _data["github"];
@@ -9133,7 +9139,12 @@ export class BloggerInfo implements IBloggerInfo {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["avatar"] = this.avatar;
+        if (Array.isArray(this.avatar)) {
+            data["avatar"] = [];
+            for (let item of this.avatar)
+                data["avatar"].push(item);
+        }
+        data["avatarUrl"] = this.avatarUrl;
         data["nikeName"] = this.nikeName;
         data["qq"] = this.qq;
         data["github"] = this.github;
@@ -9152,7 +9163,8 @@ export class BloggerInfo implements IBloggerInfo {
 }
 
 export interface IBloggerInfo {
-    avatar: string | undefined;
+    avatar: any[] | undefined;
+    avatarUrl: string | undefined;
     nikeName: string | undefined;
     qq: string | undefined;
     github: string | undefined;
@@ -9227,11 +9239,15 @@ export interface IBlogOutput {
 }
 
 export class BlogSetting implements IBlogSetting {
-    logo: string | undefined;
-    favicon: string | undefined;
+    logo: any[] | undefined;
+    logoUrl: string | undefined;
+    favicon: any[] | undefined;
+    faviconUrl: string | undefined;
     isRewards: boolean | undefined;
-    aliPay: string | undefined;
-    wxPay: string | undefined;
+    aliPay: any[] | undefined;
+    aliPayUrl: string | undefined;
+    wxPay: any[] | undefined;
+    wxPayUrl: string | undefined;
     isAllowMessage: boolean | undefined;
     isAllowComments: boolean | undefined;
     announcement: string | undefined;
@@ -9254,11 +9270,31 @@ export class BlogSetting implements IBlogSetting {
 
     init(_data?: any) {
         if (_data) {
-            this.logo = _data["logo"];
-            this.favicon = _data["favicon"];
+            if (Array.isArray(_data["logo"])) {
+                this.logo = [] as any;
+                for (let item of _data["logo"])
+                    this.logo.push(item);
+            }
+            this.logoUrl = _data["logoUrl"];
+            if (Array.isArray(_data["favicon"])) {
+                this.favicon = [] as any;
+                for (let item of _data["favicon"])
+                    this.favicon.push(item);
+            }
+            this.faviconUrl = _data["faviconUrl"];
             this.isRewards = _data["isRewards"];
-            this.aliPay = _data["aliPay"];
-            this.wxPay = _data["wxPay"];
+            if (Array.isArray(_data["aliPay"])) {
+                this.aliPay = [] as any;
+                for (let item of _data["aliPay"])
+                    this.aliPay.push(item);
+            }
+            this.aliPayUrl = _data["aliPayUrl"];
+            if (Array.isArray(_data["wxPay"])) {
+                this.wxPay = [] as any;
+                for (let item of _data["wxPay"])
+                    this.wxPay.push(item);
+            }
+            this.wxPayUrl = _data["wxPayUrl"];
             this.isAllowMessage = _data["isAllowMessage"];
             this.isAllowComments = _data["isAllowComments"];
             this.announcement = _data["announcement"];
@@ -9281,11 +9317,31 @@ export class BlogSetting implements IBlogSetting {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["logo"] = this.logo;
-        data["favicon"] = this.favicon;
+        if (Array.isArray(this.logo)) {
+            data["logo"] = [];
+            for (let item of this.logo)
+                data["logo"].push(item);
+        }
+        data["logoUrl"] = this.logoUrl;
+        if (Array.isArray(this.favicon)) {
+            data["favicon"] = [];
+            for (let item of this.favicon)
+                data["favicon"].push(item);
+        }
+        data["faviconUrl"] = this.faviconUrl;
         data["isRewards"] = this.isRewards;
-        data["aliPay"] = this.aliPay;
-        data["wxPay"] = this.wxPay;
+        if (Array.isArray(this.aliPay)) {
+            data["aliPay"] = [];
+            for (let item of this.aliPay)
+                data["aliPay"].push(item);
+        }
+        data["aliPayUrl"] = this.aliPayUrl;
+        if (Array.isArray(this.wxPay)) {
+            data["wxPay"] = [];
+            for (let item of this.wxPay)
+                data["wxPay"].push(item);
+        }
+        data["wxPayUrl"] = this.wxPayUrl;
         data["isAllowMessage"] = this.isAllowMessage;
         data["isAllowComments"] = this.isAllowComments;
         data["announcement"] = this.announcement;
@@ -9308,11 +9364,15 @@ export class BlogSetting implements IBlogSetting {
 }
 
 export interface IBlogSetting {
-    logo: string | undefined;
-    favicon: string | undefined;
+    logo: any[] | undefined;
+    logoUrl: string | undefined;
+    favicon: any[] | undefined;
+    faviconUrl: string | undefined;
     isRewards: boolean | undefined;
-    aliPay: string | undefined;
-    wxPay: string | undefined;
+    aliPay: any[] | undefined;
+    aliPayUrl: string | undefined;
+    wxPay: any[] | undefined;
+    wxPayUrl: string | undefined;
     isAllowMessage: boolean | undefined;
     isAllowComments: boolean | undefined;
     announcement: string | undefined;
