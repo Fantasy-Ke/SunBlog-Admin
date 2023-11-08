@@ -10671,7 +10671,7 @@ export class CustomConfigSetJsonInput implements ICustomConfigSetJsonInput {
     /** 自定义配置ID */
     id: string;
     /** 表单设计 */
-    json: any;
+    json: string;
 
     constructor(data?: ICustomConfigSetJsonInput) {
         if (data) {
@@ -10715,7 +10715,7 @@ export interface ICustomConfigSetJsonInput {
     /** 自定义配置ID */
     id: string;
     /** 表单设计 */
-    json: any;
+    json: string;
 }
 
 export class FriendLinkOutput implements IFriendLinkOutput {

@@ -100,7 +100,7 @@ const openDialog = async (id: string, itemId?: string) => {
 	if (jsonString) {
 		state.fileOptions = JSON.parse(`[${jsonString}]`);
 	}
-	console.log(result!.dataJson, state.fileOptions);
+	console.log(state.formData);
 
 	if (result!.dataJson && state.fileOptions.length > 0) {
 		//处理上传的附件和图片数据格式
