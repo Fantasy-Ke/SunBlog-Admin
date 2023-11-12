@@ -8,7 +8,6 @@ import { dynamicRoutes, notFoundAndNoPower } from '@/router/route';
 import { formatTwoStageRoutes, formatFlatteningRoutes, router } from '@/router/index';
 import { useRoutesList } from '@/stores/routesList';
 import { useTagsViewRoutes } from '@/stores/tagsViewRoutes';
-import SysMenuApi from '@/api/SysMenuApi';
 import { accessTokenKey } from '@/utils/request';
 import apiHttpClient from '@/utils/http';
 import { inject } from 'vue';
