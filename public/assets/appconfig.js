@@ -1,4 +1,4 @@
 window.configs = {
-  remoteServiceBaseUrl: "http://124.71.15.19:5155",
-  port:3500
+  remoteServiceBaseUrl: "http://172.27.188.45:5155",
+  port:3030
 }
