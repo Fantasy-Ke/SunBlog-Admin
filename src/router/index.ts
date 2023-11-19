@@ -11,6 +11,7 @@ import { staticRoutes, notFoundAndNoPower } from '@/router/route';
 import { initFrontEndControlRoutes } from '@/router/frontEnd';
 import { initBackEndControlRoutes } from '@/router/backEnd';
 import { accessTokenKey } from '../utils/request';
+import { useUserInfo } from '@/stores/userInfo';
 
 /**
  * 1、前端控制路由时：isRequestRoutes 为 false，需要写 roles，需要走 setFilterRoute 方法。
@@ -95,7 +96,8 @@ export function formatTwoStageRoutes(arr: any) {
 router.beforeEach(async (to, from, next) => {
 	NProgress.configure({ showSpinner: false });
 	if (to.meta.title) NProgress.start();
-	const token = Session.get(accessTokenKey);
+	const { userInfoState } = useUserInfo();
+	const token = userInfoState.zToken?.accessToken;
 	if (to.path === '/login' && !token) {
 		next();
 		NProgress.done();

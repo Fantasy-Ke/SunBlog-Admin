@@ -34,13 +34,14 @@ const dynamicViewsModules: Record<string, Function> = Object.assign({}, { ...lay
  * @method setFilterMenuAndCacheTagsViewRoutes 设置路由到 pinia routesList 中（已处理成多级嵌套路由）及缓存多级嵌套数组处理后的一维数组
  */
 export async function initBackEndControlRoutes() {
+	const { userInfoState, getUserInfo } = useUserInfo();
 	// 界面 loading 动画开始执行
 	if (window.nextLoading === undefined) NextLoading.start();
 	// 无 token 停止执行下一步
-	if (!Session.get(accessTokenKey)) return false;
+	if (!userInfoState.zToken.accessToken) return false;
 	// 触发初始化用户信息 pinia
 	// https://gitee.com/lyt-top/vue-next-admin/issues/I5F1HP
-	await useUserInfo().getUserInfo();
+	await getUserInfo();
 	// 获取路由菜单数据
 	const data = await getBackEndControlRoutes();
 	// 无登录权限时，添加判断
