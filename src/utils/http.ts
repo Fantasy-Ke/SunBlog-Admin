@@ -2,37 +2,17 @@
 import axios from 'axios';
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { ElMessage } from 'element-plus';
-import { Session } from './storage';
+import { useUserInfo } from '@/stores/userInfo';
 axios.defaults.withCredentials = true;
-// token 键定义
-export const accessTokenKey = 'access-token';
-export const refreshAccessTokenKey = `x-${accessTokenKey}`;
 
 // 清除 token
-export const clearAccessTokens = () => {
-	Session.remove(accessTokenKey);
-	Session.remove(refreshAccessTokenKey);
-};
+export const clearAccessTokens = () => {};
 
 /**
  * 检查并存储授权信息
  * @param res 响应对象
  */
-export function checkAndStoreAuthentication(res: any): void {
-	// 读取响应报文头 token 信息
-	const accessToken = res.headers[accessTokenKey];
-	const refreshAccessToken = res.headers[refreshAccessTokenKey];
-
-	// 判断是否是无效 token
-	if (accessToken === 'invalid_token') {
-		clearAccessTokens();
-	}
-	// 判断是否存在刷新 token，如果存在则存储在本地
-	else if (refreshAccessToken && accessToken && accessToken !== 'invalid_token') {
-		Session.set(accessTokenKey, accessToken);
-		Session.set(refreshAccessTokenKey, refreshAccessToken);
-	}
-}
+export function checkAndStoreAuthentication(): void {}
 
 /**
  * 解密 JWT token 的信息
@@ -66,20 +46,9 @@ export class apiHttpClient {
 		this.instance = axios.create(Object.assign(this.baseConfig, config));
 		this.instance.interceptors.request.use(
 			(config: InternalAxiosRequestConfig) => {
-				const accessToken = Session.get(accessTokenKey);
-				if (accessToken) {
-					// 判断 accessToken 是否过期
-					const jwt: any = decryptJWT(accessToken);
-					const exp = getJWTDate(jwt.exp as number);
-					//token已过期
-					if (new Date() >= exp) {
-						// 获取刷新 token
-						const refreshAccessToken = Session.get(refreshAccessTokenKey);
-						// 携带刷新 token
-						if (refreshAccessToken) {
-							config.headers!['X-Authorization'] = `Bearer ${refreshAccessToken}`;
-						}
-					}
+				const { userInfoState } = useUserInfo();
+				if (config.headers && typeof config.headers.set === 'function') {
+					config.headers.set('Authorization', `Bearer ${userInfoState.zToken?.accessToken}`);
 				}
 
 				return config;
@@ -92,7 +61,7 @@ export class apiHttpClient {
 		this.instance.interceptors.response.use(
 			async (res: AxiosResponse) => {
 				// 检查并存储授权信息
-				checkAndStoreAuthentication(res);
+				checkAndStoreAuthentication();
 				const data = res.data;
 				// code为200 或 返回的是文件流 直接返回
 				if (data.statusCode === 200 || res.config.responseType === 'blob') {

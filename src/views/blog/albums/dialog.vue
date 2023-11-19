@@ -1,6 +1,6 @@
 <template>
 	<div class="blog-album-dialog-container">
-		<el-dialog :title="state.dialog.title" v-model="state.dialog.isShowDialog" width="769px">
+		<el-dialog :title="state.dialog.title" :destroy-on-close="true" v-model="state.dialog.isShowDialog" width="769px">
 			<el-form ref="albumDialogFormRef" :rules="rules" :model="state.ruleForm" v-loading="state.dialog.loading" size="default" label-width="90px">
 				<el-row :gutter="20">
 					<el-col :span="18">

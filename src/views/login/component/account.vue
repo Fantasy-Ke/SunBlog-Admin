@@ -79,7 +79,9 @@ import { Session } from '@/utils/storage';
 import { formatAxis } from '@/utils/formatTime';
 import { NextLoading } from '@/utils/loading';
 import { AuthsServiceProxy, ZUserInfoDto } from '@/shared/service-proxies';
+import { useUserInfo } from '@/stores/userInfo';
 const _authService = new AuthsServiceProxy(inject('$baseurl'), inject('$api'));
+const storeUser = useUserInfo();
 // 定义变量内容
 const { t } = useI18n();
 const storesThemeConfig = useThemeConfig();
@@ -151,6 +153,9 @@ const onSignIn = async () => {
 				.signIn(state.ruleForm)
 				.then(async (res) => {
 					if (res.statusCode === 200) {
+						console.log(2);
+
+						await storeUser.setToken(res.result);
 						if (!themeConfig.value.isRequestRoutes) {
 							// 前端路由
 							const isNoPower = await initFrontEndControlRoutes();
