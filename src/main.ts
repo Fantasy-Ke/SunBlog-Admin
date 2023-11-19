@@ -12,7 +12,6 @@ import '@/theme/index.scss';
 import 'vform3-builds/dist/designer.style.css'; //引入VForm3样式
 import VueGridLayout from 'vue-grid-layout';
 const app = createApp(App);
-
 directive(app);
 other.elSvg(app);
 app.provide('$api', apiHttpClient);
