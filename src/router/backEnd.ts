@@ -2,13 +2,11 @@ import { RouteRecordRaw } from 'vue-router';
 import { useUserInfo } from '@/stores/userInfo';
 // import { useRequestOldRoutes } from '@/stores/requestOldRoutes';
 import pinia from '@/stores/index';
-import { Session } from '@/utils/storage';
 import { NextLoading } from '@/utils/loading';
 import { dynamicRoutes, notFoundAndNoPower } from '@/router/route';
 import { formatTwoStageRoutes, formatFlatteningRoutes, router } from '@/router/index';
 import { useRoutesList } from '@/stores/routesList';
 import { useTagsViewRoutes } from '@/stores/tagsViewRoutes';
-import { accessTokenKey } from '@/utils/request';
 import apiHttpClient from '@/utils/http';
 import { inject } from 'vue';
 import { MenusServiceProxy } from '@/shared/service-proxies';
@@ -38,7 +36,7 @@ export async function initBackEndControlRoutes() {
 	// 界面 loading 动画开始执行
 	if (window.nextLoading === undefined) NextLoading.start();
 	// 无 token 停止执行下一步
-	if (!userInfoState.zToken.accessToken) return false;
+	if (!userInfoState.zToken?.accessToken) return false;
 	// 触发初始化用户信息 pinia
 	// https://gitee.com/lyt-top/vue-next-admin/issues/I5F1HP
 	await getUserInfo();

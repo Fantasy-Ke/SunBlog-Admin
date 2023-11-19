@@ -3,12 +3,10 @@ import { RouteRecordRaw } from 'vue-router';
 import { formatTwoStageRoutes, formatFlatteningRoutes, router } from '@/router/index';
 import { dynamicRoutes, notFoundAndNoPower } from '@/router/route';
 import pinia from '@/stores/index';
-import { Session } from '@/utils/storage';
 import { useUserInfo } from '@/stores/userInfo';
 import { useTagsViewRoutes } from '@/stores/tagsViewRoutes';
 import { useRoutesList } from '@/stores/routesList';
 import { NextLoading } from '@/utils/loading';
-import { accessTokenKey } from '../utils/request';
 
 // 前端控制路由
 
@@ -20,14 +18,13 @@ import { accessTokenKey } from '../utils/request';
  * @method setFilterMenuAndCacheTagsViewRoutes 设置递归过滤有权限的路由到 pinia routesList 中（已处理成多级嵌套路由）及缓存多级嵌套数组处理后的一维数组
  */
 export async function initFrontEndControlRoutes() {
+	const { userInfoState, getUserInfo } = useUserInfo();
 	// 界面 loading 动画开始执行
 	if (window.nextLoading === undefined) NextLoading.start();
 	// 无 token 停止执行下一步
-	if (!Session.get(accessTokenKey)) return false;
+	if (!userInfoState.zToken?.accessToken) return false;
 	// 触发初始化用户信息 pinia
-	// https://gitee.com/lyt-top/vue-next-admin/issues/I5F1HP
-	const store = useUserInfo(pinia);
-	await store.getUserInfo();
+	await getUserInfo();
 	// 添加动态路由
 	await setAddRoute();
 	// 设置递归过滤有权限的路由到 pinia routesList 中（已处理成多级嵌套路由）及缓存多级嵌套数组处理后的一维数组

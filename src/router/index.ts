@@ -10,7 +10,6 @@ import { Session } from '@/utils/storage';
 import { staticRoutes, notFoundAndNoPower } from '@/router/route';
 import { initFrontEndControlRoutes } from '@/router/frontEnd';
 import { initBackEndControlRoutes } from '@/router/backEnd';
-import { accessTokenKey } from '../utils/request';
 import { useUserInfo } from '@/stores/userInfo';
 
 /**
