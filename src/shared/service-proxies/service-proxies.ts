@@ -5008,8 +5008,128 @@ export class AuthsServiceProxy {
      * @param body (optional) 
      * @return Success
      */
-    signIn(body: ZUserInfoDto | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
+    signIn(body: ZUserInfoDto | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<ZFantasyToken>> {
         let url_ = this.baseUrl + "/api/Auths/SignIn";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processSignIn(_response);
+        });
+    }
+
+    protected processSignIn(response: AxiosResponse): Promise<ZEngineResponse<ZFantasyToken>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let result200Data: any = null;
+            let resultData200  = _responseText.result;
+            result200 = ZFantasyToken.fromJS(resultData200);
+            result200Data = ZEngineResponse.fromJS(_responseText);
+            result200Data.result = result200;
+            return Promise.resolve<ZEngineResponse<ZFantasyToken>>(result200Data);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<ZFantasyToken>>(null as any);
+    }
+
+    /**
+     * 刷新token
+     * @param body (optional) 
+     * @return Success
+     */
+    refreshToken(body: ZFantasyToken | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<ZFantasyToken>> {
+        let url_ = this.baseUrl + "/api/Auths/RefreshToken";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "text/plain"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processRefreshToken(_response);
+        });
+    }
+
+    protected processRefreshToken(response: AxiosResponse): Promise<ZEngineResponse<ZFantasyToken>> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (let k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let result200Data: any = null;
+            let resultData200  = _responseText.result;
+            result200 = ZFantasyToken.fromJS(resultData200);
+            result200Data = ZEngineResponse.fromJS(_responseText);
+            result200Data.result = result200;
+            return Promise.resolve<ZEngineResponse<ZFantasyToken>>(result200Data);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<ZEngineResponse<ZFantasyToken>>(null as any);
+    }
+
+    /**
+     * 登出
+     * @param body (optional) 
+     * @return Success
+     */
+    zSignOut(body: string | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
+        let url_ = this.baseUrl + "/api/Auths/ZSignOut";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -5031,11 +5151,11 @@ export class AuthsServiceProxy {
                 throw _error;
             }
         }).then((_response: AxiosResponse) => {
-            return this.processSignIn(_response);
+            return this.processZSignOut(_response);
         });
     }
 
-    protected processSignIn(response: AxiosResponse): Promise<ZEngineResponse<void>> {
+    protected processZSignOut(response: AxiosResponse): Promise<ZEngineResponse<void>> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -5388,7 +5508,7 @@ export class OAuthsServiceProxy {
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
-            method: "POST",
+            method: "GET",
             url: url_,
             headers: {
             },
@@ -5432,7 +5552,7 @@ export class OAuthsServiceProxy {
      * @param code (optional) 
      * @return Success
      */
-    login(code: string | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<string>> {
+    login(code: string | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<ZFantasyToken>> {
         let url_ = this.baseUrl + "/api/OAuths/Login?";
         if (code === null)
             throw new Error("The parameter 'code' cannot be null.");
@@ -5441,7 +5561,7 @@ export class OAuthsServiceProxy {
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
-            method: "POST",
+            method: "GET",
             url: url_,
             headers: {
                 "Accept": "text/plain"
@@ -5460,7 +5580,7 @@ export class OAuthsServiceProxy {
         });
     }
 
-    protected processLogin(response: AxiosResponse): Promise<ZEngineResponse<string>> {
+    protected processLogin(response: AxiosResponse): Promise<ZEngineResponse<ZFantasyToken>> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -5475,17 +5595,16 @@ export class OAuthsServiceProxy {
             let result200: any = null;
             let result200Data: any = null;
             let resultData200  = _responseText.result;
-                result200 = resultData200 !== undefined ? resultData200 : <any>null;
-    
+            result200 = ZFantasyToken.fromJS(resultData200);
             result200Data = ZEngineResponse.fromJS(_responseText);
             result200Data.result = result200;
-            return Promise.resolve<ZEngineResponse<string>>(result200Data);
+            return Promise.resolve<ZEngineResponse<ZFantasyToken>>(result200Data);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<ZEngineResponse<string>>(null as any);
+        return Promise.resolve<ZEngineResponse<ZFantasyToken>>(null as any);
     }
 
     /**
@@ -9095,7 +9214,7 @@ export enum AvailabilityStatus {
 }
 
 export class BloggerInfo implements IBloggerInfo {
-    avatar: any[] | undefined;
+    avatar: ImgInfo[] | undefined;
     avatarUrl: string | undefined;
     nikeName: string | undefined;
     qq: string | undefined;
@@ -9118,7 +9237,7 @@ export class BloggerInfo implements IBloggerInfo {
             if (Array.isArray(_data["avatar"])) {
                 this.avatar = [] as any;
                 for (let item of _data["avatar"])
-                    this.avatar.push(item);
+                    this.avatar.push(ImgInfo.fromJS(item));
             }
             this.avatarUrl = _data["avatarUrl"];
             this.nikeName = _data["nikeName"];
@@ -9142,7 +9261,7 @@ export class BloggerInfo implements IBloggerInfo {
         if (Array.isArray(this.avatar)) {
             data["avatar"] = [];
             for (let item of this.avatar)
-                data["avatar"].push(item);
+                data["avatar"].push(item.toJSON());
         }
         data["avatarUrl"] = this.avatarUrl;
         data["nikeName"] = this.nikeName;
@@ -9163,7 +9282,7 @@ export class BloggerInfo implements IBloggerInfo {
 }
 
 export interface IBloggerInfo {
-    avatar: any[] | undefined;
+    avatar: ImgInfo[] | undefined;
     avatarUrl: string | undefined;
     nikeName: string | undefined;
     qq: string | undefined;
@@ -9239,14 +9358,14 @@ export interface IBlogOutput {
 }
 
 export class BlogSetting implements IBlogSetting {
-    logo: any[] | undefined;
+    logo: ImgInfo[] | undefined;
     logoUrl: string | undefined;
-    favicon: any[] | undefined;
+    favicon: ImgInfo[] | undefined;
     faviconUrl: string | undefined;
     isRewards: boolean | undefined;
-    aliPay: any[] | undefined;
+    aliPay: ImgInfo[] | undefined;
     aliPayUrl: string | undefined;
-    wxPay: any[] | undefined;
+    wxPay: ImgInfo[] | undefined;
     wxPayUrl: string | undefined;
     isAllowMessage: boolean | undefined;
     isAllowComments: boolean | undefined;
@@ -9273,26 +9392,26 @@ export class BlogSetting implements IBlogSetting {
             if (Array.isArray(_data["logo"])) {
                 this.logo = [] as any;
                 for (let item of _data["logo"])
-                    this.logo.push(item);
+                    this.logo.push(ImgInfo.fromJS(item));
             }
             this.logoUrl = _data["logoUrl"];
             if (Array.isArray(_data["favicon"])) {
                 this.favicon = [] as any;
                 for (let item of _data["favicon"])
-                    this.favicon.push(item);
+                    this.favicon.push(ImgInfo.fromJS(item));
             }
             this.faviconUrl = _data["faviconUrl"];
             this.isRewards = _data["isRewards"];
             if (Array.isArray(_data["aliPay"])) {
                 this.aliPay = [] as any;
                 for (let item of _data["aliPay"])
-                    this.aliPay.push(item);
+                    this.aliPay.push(ImgInfo.fromJS(item));
             }
             this.aliPayUrl = _data["aliPayUrl"];
             if (Array.isArray(_data["wxPay"])) {
                 this.wxPay = [] as any;
                 for (let item of _data["wxPay"])
-                    this.wxPay.push(item);
+                    this.wxPay.push(ImgInfo.fromJS(item));
             }
             this.wxPayUrl = _data["wxPayUrl"];
             this.isAllowMessage = _data["isAllowMessage"];
@@ -9320,26 +9439,26 @@ export class BlogSetting implements IBlogSetting {
         if (Array.isArray(this.logo)) {
             data["logo"] = [];
             for (let item of this.logo)
-                data["logo"].push(item);
+                data["logo"].push(item.toJSON());
         }
         data["logoUrl"] = this.logoUrl;
         if (Array.isArray(this.favicon)) {
             data["favicon"] = [];
             for (let item of this.favicon)
-                data["favicon"].push(item);
+                data["favicon"].push(item.toJSON());
         }
         data["faviconUrl"] = this.faviconUrl;
         data["isRewards"] = this.isRewards;
         if (Array.isArray(this.aliPay)) {
             data["aliPay"] = [];
             for (let item of this.aliPay)
-                data["aliPay"].push(item);
+                data["aliPay"].push(item.toJSON());
         }
         data["aliPayUrl"] = this.aliPayUrl;
         if (Array.isArray(this.wxPay)) {
             data["wxPay"] = [];
             for (let item of this.wxPay)
-                data["wxPay"].push(item);
+                data["wxPay"].push(item.toJSON());
         }
         data["wxPayUrl"] = this.wxPayUrl;
         data["isAllowMessage"] = this.isAllowMessage;
@@ -9364,14 +9483,14 @@ export class BlogSetting implements IBlogSetting {
 }
 
 export interface IBlogSetting {
-    logo: any[] | undefined;
+    logo: ImgInfo[] | undefined;
     logoUrl: string | undefined;
-    favicon: any[] | undefined;
+    favicon: ImgInfo[] | undefined;
     faviconUrl: string | undefined;
     isRewards: boolean | undefined;
-    aliPay: any[] | undefined;
+    aliPay: ImgInfo[] | undefined;
     aliPayUrl: string | undefined;
-    wxPay: any[] | undefined;
+    wxPay: ImgInfo[] | undefined;
     wxPayUrl: string | undefined;
     isAllowMessage: boolean | undefined;
     isAllowComments: boolean | undefined;
@@ -11115,6 +11234,53 @@ export class GetConfigDetailInput implements IGetConfigDetailInput {
 export interface IGetConfigDetailInput {
     id: string;
     itemId: string | undefined;
+}
+
+export class ImgInfo implements IImgInfo {
+    name: string | undefined;
+    url: string | undefined;
+
+    constructor(data?: IImgInfo) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.url = _data["url"];
+        }
+    }
+
+    static fromJS(data: any): ImgInfo {
+        data = typeof data === 'object' ? data : {};
+        let result = new ImgInfo();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["url"] = this.url;
+        return data;
+    }
+
+    clone(): ImgInfo {
+        const json = this.toJSON();
+        let result = new ImgInfo();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IImgInfo {
+    name: string | undefined;
+    url: string | undefined;
 }
 
 export class KeyDto implements IKeyDto {
@@ -14696,6 +14862,57 @@ export interface IUserPageOutputPageResult {
     pages: number;
     total: number;
     rows: UserPageOutput[] | undefined;
+}
+
+export class ZFantasyToken implements IZFantasyToken {
+    accessToken: string | undefined;
+    refreshToken: string | undefined;
+    redirectUrl: string | undefined;
+
+    constructor(data?: IZFantasyToken) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.accessToken = _data["accessToken"];
+            this.refreshToken = _data["refreshToken"];
+            this.redirectUrl = _data["redirectUrl"];
+        }
+    }
+
+    static fromJS(data: any): ZFantasyToken {
+        data = typeof data === 'object' ? data : {};
+        let result = new ZFantasyToken();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["accessToken"] = this.accessToken;
+        data["refreshToken"] = this.refreshToken;
+        data["redirectUrl"] = this.redirectUrl;
+        return data;
+    }
+
+    clone(): ZFantasyToken {
+        const json = this.toJSON();
+        let result = new ZFantasyToken();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IZFantasyToken {
+    accessToken: string | undefined;
+    refreshToken: string | undefined;
+    redirectUrl: string | undefined;
 }
 
 export class ZUserInfo implements IZUserInfo {
