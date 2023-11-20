@@ -6,12 +6,8 @@
 			</template>
 			<template #isBlogger="{ row }">
 				<!-- v-if="auth('authaccount:setblogger')" -->
-				<template>
-					<el-switch v-model="row.isBlogger" inline-prompt active-text="是" inactive-text="否" @change="onChange(row.id)" />
-				</template>
-				<!-- <template v-else>
-					<el-tag :type="row.isBlogger ? 'success' : 'danger'">{{ row.isBlogger ? '是' : '否' }}</el-tag>
-				</template> -->
+				<el-switch v-model="row.isBlogger" inline-prompt active-text="是" inactive-text="否" @change="onChange(row.id)" />
+				<!-- <el-tag :type="row.isBlogger ? 'success' : 'danger'">{{ row.isBlogger ? '是' : '否' }}</el-tag> -->
 			</template>
 			<template #action="scope">
 				<el-popconfirm title="确认删除吗？" @confirm="onDeleteRole(scope.row.id)">
