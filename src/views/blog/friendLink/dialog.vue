@@ -141,7 +141,7 @@ const openDialog = async (row: CreateOrUpdateFriendInput | null) => {
 		state.dialog.title = '修改友链';
 		state.dialog.submitTxt = '修 改';
 	} else {
-		state.ruleForm.id = '';
+		state.ruleForm.id = undefined;
 		state.dialog.title = '新增友链';
 		state.dialog.submitTxt = '新 增';
 		// 重置表单

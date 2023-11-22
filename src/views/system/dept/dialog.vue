@@ -114,7 +114,7 @@ const openDialog = async (row: UpdateOrgInput | null = null) => {
 		state.dialog.title = '修改部门';
 		state.dialog.submitTxt = '修 改';
 	} else {
-		state.ruleForm.id = '';
+		state.ruleForm.id = undefined;
 		state.dialog.title = '新增部门';
 		state.dialog.submitTxt = '新 增';
 		nextTick(() => {

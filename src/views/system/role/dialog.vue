@@ -124,7 +124,7 @@ const openDialog = async (row: UpdateSysRoleInput | null) => {
 		state.dialog.submitTxt = '修 改';
 		treeRef.value?.setCheckedKeys(result ?? []);
 	} else {
-		state.ruleForm.id = '';
+		state.ruleForm.id = undefined;
 		state.dialog.title = '新增角色';
 		state.dialog.submitTxt = '新 增';
 		// 重置表单

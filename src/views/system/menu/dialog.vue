@@ -239,7 +239,7 @@ const openDialog = async (id: string) => {
 		const { result } = await _menuService.detail(id!);
 		state.ruleForm = result! as UpdateSysMenuInput;
 	} else {
-		state.ruleForm.id = '';
+		state.ruleForm.id = undefined;
 		state.dialog.title = '新增菜单';
 		state.dialog.submitTxt = '新 增';
 		// 清空表单，此项需加表单验证才能使用

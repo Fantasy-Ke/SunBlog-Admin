@@ -128,7 +128,7 @@ const openDialog = async (row: UpdateCustomConfigInput | null, isGenerate: boole
 		state.dialog.title = '修改配置';
 		state.dialog.submitTxt = '修 改';
 	} else {
-		state.ruleForm.id = '';
+		state.ruleForm.id = undefined;
 		state.dialog.title = '新增配置';
 		state.dialog.submitTxt = '新 增';
 		// 重置表单

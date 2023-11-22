@@ -179,7 +179,7 @@ const openDialog = async (id: string, orgs: TreeSelectOutput[]) => {
 		state.dialog.title = '修改用户';
 		state.dialog.submitTxt = '修 改';
 	} else {
-		state.ruleForm.id = '';
+		state.ruleForm.id = undefined;
 		state.dialog.title = '新增用户';
 		state.dialog.submitTxt = '新 增';
 		// 重置表单
