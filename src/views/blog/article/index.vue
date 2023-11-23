@@ -24,6 +24,9 @@
 						新增
 					</el-button></template
 				>
+				<template #cover="{ row }">
+					<el-image shape="square" :size="100" fit="cover" :src="row.cover" />
+				</template>
 				<template #isTop="{ row }">
 					<el-tag :type="row.isTop ? 'danger' : 'info'"> {{ row.isTop ? '是' : '否' }}</el-tag>
 				</template>
@@ -87,6 +90,11 @@ const columns = reactive<ColumnProps[]>([
 		search: {
 			el: 'input',
 		},
+	},
+	{
+		prop: 'cover',
+		label: '封面',
+		width: 180,
 	},
 	{ prop: 'views', label: '浏览量', width: 100 },
 	{ prop: 'isTop', label: '置顶', width: 80 },

@@ -9213,85 +9213,6 @@ export enum AvailabilityStatus {
     _1 = 1,
 }
 
-export class BloggerInfo implements IBloggerInfo {
-    avatar: ImgInfo[] | undefined;
-    avatarUrl: string | undefined;
-    nikeName: string | undefined;
-    qq: string | undefined;
-    github: string | undefined;
-    gitee: string | undefined;
-    motto: string | undefined;
-    about: string | undefined;
-
-    constructor(data?: IBloggerInfo) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            if (Array.isArray(_data["avatar"])) {
-                this.avatar = [] as any;
-                for (let item of _data["avatar"])
-                    this.avatar.push(ImgInfo.fromJS(item));
-            }
-            this.avatarUrl = _data["avatarUrl"];
-            this.nikeName = _data["nikeName"];
-            this.qq = _data["qq"];
-            this.github = _data["github"];
-            this.gitee = _data["gitee"];
-            this.motto = _data["motto"];
-            this.about = _data["about"];
-        }
-    }
-
-    static fromJS(data: any): BloggerInfo {
-        data = typeof data === 'object' ? data : {};
-        let result = new BloggerInfo();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.avatar)) {
-            data["avatar"] = [];
-            for (let item of this.avatar)
-                data["avatar"].push(item.toJSON());
-        }
-        data["avatarUrl"] = this.avatarUrl;
-        data["nikeName"] = this.nikeName;
-        data["qq"] = this.qq;
-        data["github"] = this.github;
-        data["gitee"] = this.gitee;
-        data["motto"] = this.motto;
-        data["about"] = this.about;
-        return data;
-    }
-
-    clone(): BloggerInfo {
-        const json = this.toJSON();
-        let result = new BloggerInfo();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IBloggerInfo {
-    avatar: ImgInfo[] | undefined;
-    avatarUrl: string | undefined;
-    nikeName: string | undefined;
-    qq: string | undefined;
-    github: string | undefined;
-    gitee: string | undefined;
-    motto: string | undefined;
-    about: string | undefined;
-}
-
 export class BlogOutput implements IBlogOutput {
     site: BlogSetting;
     info: BloggerInfo;
@@ -9502,6 +9423,89 @@ export interface IBlogSetting {
     description: string | undefined;
     keyword: string | undefined;
     filing: string | undefined;
+}
+
+export class BloggerInfo implements IBloggerInfo {
+    avatar: ImgInfo[] | undefined;
+    avatarUrl: string | undefined;
+    nikeName: string | undefined;
+    qq: string | undefined;
+    github: string | undefined;
+    gitee: string | undefined;
+    motto: string | undefined;
+    about: string | undefined;
+    donation: string | undefined;
+
+    constructor(data?: IBloggerInfo) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["avatar"])) {
+                this.avatar = [] as any;
+                for (let item of _data["avatar"])
+                    this.avatar.push(ImgInfo.fromJS(item));
+            }
+            this.avatarUrl = _data["avatarUrl"];
+            this.nikeName = _data["nikeName"];
+            this.qq = _data["qq"];
+            this.github = _data["github"];
+            this.gitee = _data["gitee"];
+            this.motto = _data["motto"];
+            this.about = _data["about"];
+            this.donation = _data["donation"];
+        }
+    }
+
+    static fromJS(data: any): BloggerInfo {
+        data = typeof data === 'object' ? data : {};
+        let result = new BloggerInfo();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.avatar)) {
+            data["avatar"] = [];
+            for (let item of this.avatar)
+                data["avatar"].push(item.toJSON());
+        }
+        data["avatarUrl"] = this.avatarUrl;
+        data["nikeName"] = this.nikeName;
+        data["qq"] = this.qq;
+        data["github"] = this.github;
+        data["gitee"] = this.gitee;
+        data["motto"] = this.motto;
+        data["about"] = this.about;
+        data["donation"] = this.donation;
+        return data;
+    }
+
+    clone(): BloggerInfo {
+        const json = this.toJSON();
+        let result = new BloggerInfo();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IBloggerInfo {
+    avatar: ImgInfo[] | undefined;
+    avatarUrl: string | undefined;
+    nikeName: string | undefined;
+    qq: string | undefined;
+    github: string | undefined;
+    gitee: string | undefined;
+    motto: string | undefined;
+    about: string | undefined;
+    donation: string | undefined;
 }
 
 export class CategoryOutput implements ICategoryOutput {
@@ -9977,6 +9981,7 @@ export enum CoverType {
     _9 = 9,
     _10 = 10,
     _11 = 11,
+    _12 = 12,
 }
 
 export class CreateOrUpdateAlbumsInput implements ICreateOrUpdateAlbumsInput {

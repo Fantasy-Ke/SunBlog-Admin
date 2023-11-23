@@ -73,6 +73,7 @@ const albumType = [
 	'友情链接封面图',
 	'标签列表封面图',
 	'分类列表封面图',
+	'打赏封面图',
 ];
 const router = useRouter();
 //  table实例
