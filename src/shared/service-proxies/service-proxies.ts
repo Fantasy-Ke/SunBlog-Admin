@@ -475,7 +475,7 @@ export class ArticleCategorysServiceProxy {
 
         let options_: AxiosRequestConfig = {
             data: content_,
-            method: "PUT",
+            method: "POST",
             url: url_,
             headers: {
                 "Content-Type": "application/json",
@@ -2293,7 +2293,7 @@ export class CustomConfigItemsServiceProxy {
 
         let options_: AxiosRequestConfig = {
             data: content_,
-            method: "PUT",
+            method: "POST",
             url: url_,
             headers: {
                 "Content-Type": "application/json",
@@ -3044,21 +3044,21 @@ export class FriendLinksServiceProxy {
 
     /**
      * 删除
-     * @param id (optional) 
+     * @param body (optional) 
      * @return Success
      */
-    delete(id: string | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
-        let url_ = this.baseUrl + "/api/FriendLinks/Delete?";
-        if (id === null)
-            throw new Error("The parameter 'id' cannot be null.");
-        else if (id !== undefined)
-            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+    delete(body: KeyDto | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
+        let url_ = this.baseUrl + "/api/FriendLinks/Delete";
         url_ = url_.replace(/[?&]$/, "");
 
+        const content_ = JSON.stringify(body);
+
         let options_: AxiosRequestConfig = {
-            method: "DELETE",
+            data: content_,
+            method: "POST",
             url: url_,
             headers: {
+                "Content-Type": "application/json",
             },
             cancelToken
         };
@@ -4545,6 +4545,7 @@ export class PictureSsServiceProxy {
     }
 
     /**
+     * 删除
      * @param id (optional) 
      * @return Success
      */
@@ -4609,7 +4610,7 @@ export class PictureSsServiceProxy {
 
         let options_: AxiosRequestConfig = {
             data: content_,
-            method: "DELETE",
+            method: "POST",
             url: url_,
             headers: {
                 "Content-Type": "application/json",
@@ -5140,21 +5141,21 @@ export class TagssServiceProxy {
 
     /**
      * 删除
-     * @param id (optional) 
+     * @param body (optional) 
      * @return Success
      */
-    delete(id: string | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
-        let url_ = this.baseUrl + "/api/Tagss/Delete?";
-        if (id === null)
-            throw new Error("The parameter 'id' cannot be null.");
-        else if (id !== undefined)
-            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+    delete(body: KeyDto | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
+        let url_ = this.baseUrl + "/api/Tagss/Delete";
         url_ = url_.replace(/[?&]$/, "");
 
+        const content_ = JSON.stringify(body);
+
         let options_: AxiosRequestConfig = {
-            method: "DELETE",
+            data: content_,
+            method: "POST",
             url: url_,
             headers: {
+                "Content-Type": "application/json",
             },
             cancelToken
         };
@@ -5516,21 +5517,21 @@ export class TalksSsServiceProxy {
 
     /**
      * 删除
-     * @param id (optional) 
+     * @param body (optional) 
      * @return Success
      */
-    delete(id: string | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
-        let url_ = this.baseUrl + "/api/TalksSs/Delete?";
-        if (id === null)
-            throw new Error("The parameter 'id' cannot be null.");
-        else if (id !== undefined)
-            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+    delete(body: KeyDto | undefined, cancelToken?: CancelToken): Promise<ZEngineResponse<void>> {
+        let url_ = this.baseUrl + "/api/TalksSs/Delete";
         url_ = url_.replace(/[?&]$/, "");
 
+        const content_ = JSON.stringify(body);
+
         let options_: AxiosRequestConfig = {
-            method: "DELETE",
+            data: content_,
+            method: "POST",
             url: url_,
             headers: {
+                "Content-Type": "application/json",
             },
             cancelToken
         };
@@ -6675,7 +6676,7 @@ export class UserSyssServiceProxy {
 
         let options_: AxiosRequestConfig = {
             data: content_,
-            method: "PUT",
+            method: "POST",
             url: url_,
             headers: {
                 "Content-Type": "application/json",
