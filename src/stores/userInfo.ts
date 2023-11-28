@@ -21,6 +21,10 @@ export const useUserInfo = defineStore(StoreKey.UserInfo, () => {
 	const setToken = (zToken: ZFantasyToken) => {
 		userStore.setToken({ zToken: zToken });
 	};
+
+	const clearToken = () => {
+		userStore.$reset();
+	};
 	/**
 	 * 获取当前用户基本信息
 	 */
@@ -32,5 +36,5 @@ export const useUserInfo = defineStore(StoreKey.UserInfo, () => {
 	 * 获取当前用户基本信息
 	 */
 
-	return { userInfoState, userInfo, getUserInfo, setToken };
+	return { userInfoState, userInfo, getUserInfo, setToken, clearToken };
 });
